@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MdAdd, MdCheckCircle, MdCancel, MdVisibility, MdDownload, MdFilterList } from 'react-icons/md';
+import { usePortal } from '../../context/PortalContext';
 
 const initialClaims = [];
 
@@ -52,9 +53,38 @@ const ClaimsManagement = () => {
   const [claims, setClaims] = useState(initialClaims);
   const [selected, setSelected] = useState(null);
   const [filter, setFilter] = useState({ status: 'All', type: 'All', search: '' });
+  const { refreshKey } = usePortal();
 
-  const approve = (id) => setClaims(prev => prev.map(c => c.id === id ? { ...c, status: 'approved' } : c));
-  const reject  = (id) => setClaims(prev => prev.map(c => c.id === id ? { ...c, status: 'rejected' } : c));
+  useEffect(() => {
+    fetch('http://localhost:5000/api/admin/claims')
+      .then(res => res.json())
+      .then(data => {
+        if(data.data) setClaims(data.data);
+      })
+      .catch(console.error);
+  }, [refreshKey]);
+
+  const approve = async (id) => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/admin/claims/${id}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'approved' })
+      });
+      if (res.ok) setClaims(prev => prev.map(c => c.id === id ? { ...c, status: 'approved' } : c));
+    } catch (err) { console.error(err); }
+  };
+
+  const reject = async (id) => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/admin/claims/${id}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'rejected' })
+      });
+      if (res.ok) setClaims(prev => prev.map(c => c.id === id ? { ...c, status: 'rejected' } : c));
+    } catch (err) { console.error(err); }
+  };
 
   const filtered = claims.filter(c => {
     if (filter.status !== 'All' && c.status !== filter.status) return false;

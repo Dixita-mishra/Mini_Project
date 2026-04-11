@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MdAdd, MdEdit, MdBlock, MdCheckCircle, MdVisibility, MdEmail, MdPhone } from 'react-icons/md';
+import { usePortal } from '../../context/PortalContext';
 
 const initialUsers = [];
 
 const avatarColors = ['#3b82f6','#10b981','#f59e0b','#8b5cf6','#f43f5e','#06b6d4','#ec4899','#14b8a6'];
 
-const UserModal = ({ user, onClose }) => {
+const UserModal = ({ user, onClose, onSave }) => {
   const [form, setForm] = useState(user || { name: '', email: '', phone: '', city: '', status: 'active' });
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -46,7 +47,7 @@ const UserModal = ({ user, onClose }) => {
         </div>
         <div className="modal-footer">
           <button className="btn btn-secondary" onClick={onClose}>Cancel</button>
-          <button className="btn btn-primary" onClick={onClose}>{user ? 'Save Changes' : 'Add User'}</button>
+          <button className="btn btn-primary" onClick={() => onSave(form)}>{user ? 'Save Changes' : 'Add User'}</button>
         </div>
       </div>
     </div>
@@ -59,8 +60,53 @@ const UserManagement = () => {
   const [selected, setSelected] = useState(null);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
+  const { refreshKey } = usePortal();
 
-  const toggleStatus = (id) => setUsers(prev => prev.map(u => u.id === id ? { ...u, status: u.status === 'blocked' ? 'active' : 'blocked' } : u));
+  useEffect(() => {
+    fetch('http://localhost:5000/api/admin/users')
+      .then(res => res.json())
+      .then(data => {
+        if(data.data) setUsers(data.data);
+      })
+      .catch(console.error);
+  }, [refreshKey]);
+
+  const toggleStatus = async (id) => {
+    // find user first to get what the new status should be
+    const user = users.find(u => u.id === id);
+    if (!user) return;
+    const newStatus = user.status === 'blocked' ? 'active' : 'blocked';
+    
+    try {
+      const res = await fetch(`http://localhost:5000/api/admin/users/${id}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+      if (res.ok) {
+        setUsers(prev => prev.map(u => u.id === id ? { ...u, status: newStatus } : u));
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleSaveUser = async (formData) => {
+    try {
+      const res = await fetch('http://localhost:5000/api/admin/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      if (res.ok) {
+        const result = await res.json();
+        setUsers(prev => [...prev, result.data]);
+        setModal(null);
+      }
+    } catch (err) {
+      console.error('Error saving user', err);
+    }
+  };
 
   const filtered = users.filter(u => {
     if (statusFilter !== 'All' && u.status !== statusFilter) return false;
@@ -148,7 +194,7 @@ const UserManagement = () => {
         ))}
       </div>
 
-      {modal && <UserModal user={selected} onClose={() => setModal(null)} />}
+      {modal && <UserModal user={selected} onClose={() => setModal(null)} onSave={handleSaveUser} />}
     </div>
   );
 };
