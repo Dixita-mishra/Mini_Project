@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MdDownload, MdDateRange, MdTrendingUp } from 'react-icons/md';
 import {
   AreaChart, Area, BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from 'recharts';
+import { usePortal } from '../../context/PortalContext';
 
 const monthlyData = [];
 
@@ -29,6 +30,32 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 const Reports = () => {
   const [period, setPeriod] = useState('2025-26');
+  const [reportData, setReportData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const { refreshKey } = usePortal();
+
+  useEffect(() => {
+    const fetchReports = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(`http://localhost:5000/api/admin/reports?period=${period}`);
+        const data = await response.json();
+        if (response.ok) {
+          setReportData(data.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch reports', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchReports();
+  }, [period, refreshKey]);
+
+  if (loading) return <div className="page-container">Loading reports...</div>;
+  if (!reportData) return <div className="page-container">No report data found.</div>;
+
+  const { monthlyData, typeRevenueData, agentPerf, settlementData, kpis } = reportData;
 
   return (
     <div className="page-container">
@@ -48,10 +75,10 @@ const Reports = () => {
       {/* KPI Cards */}
       <div className="stats-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: 24 }}>
         {[
-          { label: 'Total Revenue',      val: '₹0', sub: '+0% YoY', color: 'green' },
-          { label: 'Total Policies',     val: '0',      sub: '+0% YoY',  color: 'blue' },
-          { label: 'Claims Settled',     val: '₹0',      sub: '0% ratio', color: 'purple' },
-          { label: 'New Clients',        val: '0',       sub: '+0% YoY', color: 'cyan' },
+          { label: 'Total Revenue',      val: kpis.totalRevenue.value, sub: kpis.totalRevenue.sub, color: 'green' },
+          { label: 'Total Policies',     val: kpis.totalPolicies.value, sub: kpis.totalPolicies.sub,  color: 'blue' },
+          { label: 'Claims Settled',     val: kpis.claimsSettled.value, sub: kpis.claimsSettled.sub, color: 'purple' },
+          { label: 'New Clients',        val: kpis.newClients.value, sub: kpis.newClients.sub, color: 'cyan' },
         ].map(s => (
           <div key={s.label} className={`stat-card ${s.color}`} style={{ padding: '18px 20px' }}>
             <div className="stat-label">{s.label}</div>
@@ -104,7 +131,7 @@ const Reports = () => {
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={typeRevenueData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
               <CartesianGrid stroke="rgba(0,0,0,0.05)" strokeDasharray="3 3" />
-              <XAxis dataKey="type" tick={{ fill: '#4b5a72', fontSize: 11 }} axisLine={false} tickLine={false} />
+              <XAxis dataKey="insuranceType" tick={{ fill: '#4b5a72', fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: '#4b5a72', fontSize: 11 }} axisLine={false} tickLine={false} />
               <Tooltip contentStyle={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.1)', borderRadius: 8 }} formatter={v => `₹${(v/100000).toFixed(1)}L`} />
               <Bar dataKey="revenue" radius={[4,4,0,0]} fill="#3b82f6" name="Revenue">
@@ -153,23 +180,28 @@ const Reports = () => {
           </div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: '8px 0' }}>
-          {agentPerf.map((a, i) => (
-            <div key={a.name}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                  <span style={{ width: 22, height: 22, borderRadius: '50%', background: ['#f59e0b','#475569','#cd7f32','#3b82f6','#8b5cf6'][i], display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, color: '#fff' }}>{i+1}</span>
-                  <span style={{ fontWeight: 600, fontSize: 14 }}>{a.name}</span>
+          {(() => {
+            const maxPolicies = Math.max(...agentPerf.map(a => a.policies), 1);
+            return agentPerf.map((a, i) => (
+              <div key={a.name}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                  <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                    <span style={{ width: 22, height: 22, borderRadius: '50%', background: ['#f59e0b','#475569','#cd7f32','#3b82f6','#8b5cf6'][i], display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, color: '#fff' }}>{i+1}</span>
+                    <span style={{ fontWeight: 600, fontSize: 14 }}>{a.name}</span>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--emerald-light)' }}>
+                      ₹{(a.revenue/100000).toFixed(1)}L
+                    </span>
+                    <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 8 }}>{a.policies} policies</span>
+                  </div>
                 </div>
-                <div style={{ textAlign: 'right' }}>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--emerald-light)' }}>₹{(a.revenue/100000).toFixed(1)}L</span>
-                  <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 8 }}>{a.policies} policies</span>
+                <div className="progress-bar-wrap">
+                  <div className="progress-bar blue" style={{ width: `${(a.policies / maxPolicies) * 100}%` }} />
                 </div>
               </div>
-              <div className="progress-bar-wrap">
-                <div className="progress-bar blue" style={{ width: `${(a.policies / 70) * 100}%` }} />
-              </div>
-            </div>
-          ))}
+            ));
+          })()}
         </div>
       </div>
     </div>

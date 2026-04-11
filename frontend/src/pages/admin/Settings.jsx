@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MdSave, MdNotifications, MdSecurity, MdPalette, MdBusiness, MdEmail } from 'react-icons/md';
 
+const API = 'http://localhost:5000/api/admin';
 const sections = ['General', 'Notifications', 'Security', 'Appearance', 'Email Templates', 'Billing'];
 
 const Settings = () => {
   const [activeSection, setActiveSection] = useState('General');
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saveMsg, setSaveMsg] = useState('');
   const [toggles, setToggles] = useState({
     emailNotif: true, smsNotif: false, pushNotif: true,
     claimAlerts: true, renewalReminders: true, paymentAlerts: true,
@@ -12,6 +16,65 @@ const Settings = () => {
     darkMode: true, compactView: false, animations: true,
   });
   const [company, setCompany] = useState({ name: 'InsureIQ Pvt. Ltd.', email: 'admin@insureiq.com', phone: '+91 98100 00000', address: '12, Insurance Tower, BKC, Mumbai – 400051', website: 'www.insureiq.com', gstin: '27AABCI1234A1Z5' });
+  const [appearance, setAppearance] = useState({ accentColor: '#3b82f6', sidebarWidth: 'Default (260px)' });
+  const [password, setPassword] = useState({ newPassword: '', confirmPassword: '' });
+  const [pwdMsg, setPwdMsg] = useState('');
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await fetch(`${API}/settings`);
+        const data = await res.json();
+        if (res.ok && data.data) {
+          setCompany(prev => ({ ...prev, ...data.data.company }));
+          setToggles(prev => ({ ...prev, ...data.data.toggles }));
+          setAppearance(prev => ({ ...prev, ...data.data.appearance }));
+        }
+      } catch (e) {
+        console.error('Failed to fetch settings', e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSettings();
+  }, []);
+
+  const handleSave = async () => {
+    setSaving(true);
+    setSaveMsg('');
+    try {
+      const res = await fetch(`${API}/settings`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ company, toggles, appearance })
+      });
+      const data = await res.json();
+      setSaveMsg(res.ok ? '✓ Settings saved successfully' : data.message || 'Error saving');
+    } catch (e) {
+      setSaveMsg('Failed to connect to server');
+    } finally {
+      setSaving(false);
+      setTimeout(() => setSaveMsg(''), 3000);
+    }
+  };
+
+  const handlePasswordUpdate = async () => {
+    setPwdMsg('');
+    try {
+      const res = await fetch(`${API}/settings/password`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(password)
+      });
+      const data = await res.json();
+      setPwdMsg(res.ok ? '✓ ' + data.message : '✗ ' + (data.message || 'Error'));
+      if (res.ok) setPassword({ newPassword: '', confirmPassword: '' });
+    } catch (e) {
+      setPwdMsg('Failed to connect to server');
+    } finally {
+      setTimeout(() => setPwdMsg(''), 4000);
+    }
+  };
 
   const Toggle = ({ k }) => (
     <label className="toggle-switch">
@@ -19,6 +82,8 @@ const Settings = () => {
       <span className="toggle-slider" />
     </label>
   );
+
+  if (loading) return <div className="page-container">Loading settings...</div>;
 
   return (
     <div className="page-container">
@@ -28,12 +93,14 @@ const Settings = () => {
           <p>Configure your InsureIQ platform preferences</p>
         </div>
         <div className="page-header-actions">
-          <button className="btn btn-primary"><MdSave /> Save Changes</button>
+          {saveMsg && <span style={{ fontSize: 13, color: saveMsg.startsWith('✓') ? '#10b981' : '#ef4444', fontWeight: 600 }}>{saveMsg}</span>}
+          <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
+            <MdSave /> {saving ? 'Saving...' : 'Save Changes'}
+          </button>
         </div>
       </div>
 
       <div className="settings-grid">
-        {/* Left Nav */}
         <div>
           <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: '12px' }}>
             {sections.map(s => (
@@ -44,7 +111,6 @@ const Settings = () => {
           </div>
         </div>
 
-        {/* Right Content */}
         <div>
           {activeSection === 'General' && (
             <>
@@ -150,10 +216,11 @@ const Settings = () => {
               </div>
               <div className="form-group" style={{ marginTop: 20 }}>
                 <label className="form-label">Change Admin Password</label>
-                <input className="form-input" type="password" placeholder="New password" style={{ marginBottom: 10 }} />
-                <input className="form-input" type="password" placeholder="Confirm new password" />
+                <input className="form-input" type="password" placeholder="New password" style={{ marginBottom: 10 }} value={password.newPassword} onChange={e => setPassword({ ...password, newPassword: e.target.value })} />
+                <input className="form-input" type="password" placeholder="Confirm new password" value={password.confirmPassword} onChange={e => setPassword({ ...password, confirmPassword: e.target.value })} />
               </div>
-              <button className="btn btn-primary btn-sm" style={{ marginTop: 10 }}><MdSecurity /> Update Password</button>
+              {pwdMsg && <div style={{ fontSize: 13, fontWeight: 600, color: pwdMsg.startsWith('✓') ? '#10b981' : '#ef4444', marginBottom: 10 }}>{pwdMsg}</div>}
+              <button className="btn btn-primary btn-sm" style={{ marginTop: 10 }} onClick={handlePasswordUpdate}><MdSecurity /> Update Password</button>
             </div>
           )}
 
@@ -169,15 +236,15 @@ const Settings = () => {
                 <label className="form-label">Primary Accent Color</label>
                 <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
                   {['#3b82f6','#10b981','#8b5cf6','#f59e0b','#f43f5e','#06b6d4'].map(c => (
-                    <div key={c} style={{ width: 32, height: 32, borderRadius: '50%', background: c, cursor: 'pointer', border: c === '#3b82f6' ? '3px solid white' : '3px solid transparent', transition: 'all 0.2s' }} />
+                    <div key={c} onClick={() => setAppearance({ ...appearance, accentColor: c })} style={{ width: 32, height: 32, borderRadius: '50%', background: c, cursor: 'pointer', border: c === appearance.accentColor ? '3px solid white' : '3px solid transparent', transition: 'all 0.2s', boxShadow: c === appearance.accentColor ? `0 0 0 2px ${c}` : 'none' }} />
                   ))}
                 </div>
               </div>
               <div className="form-group">
                 <label className="form-label">Sidebar Width</label>
-                <select className="form-select" style={{ maxWidth: 200 }}>
+                <select className="form-select" style={{ maxWidth: 200 }} value={appearance.sidebarWidth} onChange={e => setAppearance({ ...appearance, sidebarWidth: e.target.value })}>
                   <option>Compact (220px)</option>
-                  <option selected>Default (260px)</option>
+                  <option>Default (260px)</option>
                   <option>Wide (300px)</option>
                 </select>
               </div>

@@ -1,12 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MdAdd, MdEdit, MdStar, MdStarBorder, MdPhone, MdEmail, MdLocationOn, MdTrendingUp } from 'react-icons/md';
+import { usePortal } from '../../context/PortalContext';
 
 const initialAgents = [];
 
 const agentColors = ['linear-gradient(135deg, #3b82f6, #8b5cf6)', 'linear-gradient(135deg, #10b981, #06b6d4)', 'linear-gradient(135deg, #f59e0b, #f43f5e)', 'linear-gradient(135deg, #8b5cf6, #f43f5e)', 'linear-gradient(135deg, #06b6d4, #10b981)'];
 
-const AgentModal = ({ agent, onClose }) => {
+const AgentModal = ({ agent, onClose, onSave }) => {
   const [form, setForm] = useState(agent || { name: '', email: '', phone: '', city: '', specialization: 'Health & Life' });
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    try {
+      const url = agent 
+        ? `http://localhost:5000/api/admin/agents/${agent.id}`
+        : 'http://localhost:5000/api/admin/agents';
+      const method = agent ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form)
+      });
+      
+      const data = await response.json();
+      if (response.ok) {
+        onSave(data.data);
+        onClose();
+      } else {
+        alert(data.message || 'Error saving agent');
+      }
+    } catch (err) {
+      console.error('Failed to save agent', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={e => e.stopPropagation()}>
@@ -44,8 +75,10 @@ const AgentModal = ({ agent, onClose }) => {
           </div>
         </div>
         <div className="modal-footer">
-          <button className="btn btn-secondary" onClick={onClose}>Cancel</button>
-          <button className="btn btn-primary" onClick={onClose}>{agent ? 'Save Changes' : 'Add Agent'}</button>
+          <button className="btn btn-secondary" onClick={onClose} disabled={loading}>Cancel</button>
+          <button className="btn btn-primary" onClick={handleSubmit} disabled={loading}>
+            {loading ? 'Saving...' : (agent ? 'Save Changes' : 'Add Agent')}
+          </button>
         </div>
       </div>
     </div>
@@ -53,9 +86,36 @@ const AgentModal = ({ agent, onClose }) => {
 };
 
 const Agents = () => {
-  const [agents] = useState(initialAgents);
+  const [agents, setAgents] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(null);
   const [selected, setSelected] = useState(null);
+  const { refreshKey } = usePortal();
+
+  useEffect(() => {
+    const fetchAgents = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/admin/agents');
+        const data = await response.json();
+        if (response.ok) {
+          setAgents(data.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch agents', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAgents();
+  }, [refreshKey]);
+
+  const handleSave = (savedAgent) => {
+    if (selected) {
+      setAgents(agents.map(a => a.id === savedAgent.id ? savedAgent : a));
+    } else {
+      setAgents([...agents, savedAgent]);
+    }
+  };
 
   const renderStars = (rating) => {
     return [1,2,3,4,5].map(s => (
@@ -154,7 +214,13 @@ const Agents = () => {
         ))}
       </div>
 
-      {modal && <AgentModal agent={selected} onClose={() => setModal(null)} />}
+      {modal && (
+        <AgentModal 
+          agent={selected} 
+          onClose={() => setModal(null)} 
+          onSave={handleSave}
+        />
+      )}
     </div>
   );
 };

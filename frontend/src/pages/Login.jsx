@@ -10,14 +10,29 @@ const Login = () => {
   const [formData, setFormData] = useState({ username: '', password: '', remember: false });
   const [role, setRole] = useState('user'); // default role
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Simulate login and redirect based on role
-    switchPortal(role);
-    if (role === 'admin') {
-      navigate('/admin/dashboard');
-    } else {
-      navigate('/user/dashboard');
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: formData.username, password: formData.password, role })
+      });
+      const data = await response.json();
+      
+      if (response.ok) {
+        switchPortal(role);
+        if (role === 'admin') {
+          navigate('/admin/dashboard');
+        } else {
+          navigate('/user/dashboard');
+        }
+      } else {
+        alert(data.message || 'Login failed');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('Error connecting to server');
     }
   };
 

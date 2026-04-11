@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, AreaChart, Area
@@ -9,15 +9,7 @@ import {
   MdCheckCircle, MdSchedule, MdWarning, MdFiberManualRecord
 } from 'react-icons/md';
 import Partners from '../../components/Partners';
-
-/* ─── Mock Data ─── */
-const revenueData = [];
-
-const policyTypeData = [];
-
-const recentActivity = [];
-
-const recentClaims = [];
+import { usePortal } from '../../context/PortalContext';
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
@@ -36,17 +28,55 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 const AdminDashboard = () => {
+  const [dashboardData, setDashboardData] = useState({
+    revenueData: [],
+    policyTypeData: [],
+    recentActivity: [],
+    recentClaims: [],
+    stats: {
+      totalPolicies: { value: '0', change: '0%', up: true },
+      totalRevenue: { value: '₹0', change: '0%', up: true },
+      activeClaims: { value: '0', change: '0%', up: false },
+      totalClients: { value: '0', change: '0%', up: true },
+      renewalsDue: { value: '0', change: '0%', up: false },
+      claimRatio: { value: '0%', change: '0%', up: true }
+    }
+  });
+  const [loading, setLoading] = useState(true);
+  const { refreshKey } = usePortal();
+
+  useEffect(() => {
+    const fetchDashboard = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/admin/dashboard');
+        const data = await response.json();
+        if(response.ok) {
+          setDashboardData(data.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch dashboard data', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDashboard();
+  }, [refreshKey]);
+
+  const { revenueData, policyTypeData, recentActivity, recentClaims, stats } = dashboardData;
+
+  if (loading) return <div style={{ padding: 40 }}>Loading dashboard...</div>;
+
   return (
     <div className="page-container">
       {/* Stats Grid */}
       <div className="stats-grid">
         {[
-          { label: 'Total Policies',    value: '0',       change: '0%',    up: true,  icon: <MdPolicy />,       color: 'blue',   sub: 'vs last month' },
-          { label: 'Total Revenue',     value: '₹0',      change: '0%',    up: true,  icon: <MdAttachMoney />,  color: 'green',  sub: 'vs last month' },
-          { label: 'Active Claims',     value: '0',       change: '0%',    up: false, icon: <MdAssignment />,   color: 'amber',  sub: 'needs attention' },
-          { label: 'Total Clients',     value: '0',       change: '0%',    up: true,  icon: <MdPeople />,       color: 'purple', sub: 'registered users' },
-          { label: 'Renewals Due',      value: '0',       change: '0%',    up: false, icon: <MdSchedule />,     color: 'rose',   sub: 'this month' },
-          { label: 'Claim Ratio',       value: '0%',      change: '0%',    up: true,  icon: <MdTrendingUp />,   color: 'cyan',   sub: 'settlement rate' },
+          { label: 'Total Policies',    value: stats.totalPolicies?.value || '0',       change: stats.totalPolicies?.change || '0%',    up: stats.totalPolicies?.up ?? true,  icon: <MdPolicy />,       color: 'blue',   sub: 'vs last month' },
+          { label: 'Total Revenue',     value: stats.totalRevenue?.value || '₹0',      change: stats.totalRevenue?.change || '0%',    up: stats.totalRevenue?.up ?? true,  icon: <MdAttachMoney />,  color: 'green',  sub: 'vs last month' },
+          { label: 'Active Claims',     value: stats.activeClaims?.value || '0',       change: stats.activeClaims?.change || '0%',    up: stats.activeClaims?.up ?? false, icon: <MdAssignment />,   color: 'amber',  sub: 'needs attention' },
+          { label: 'Total Clients',     value: stats.totalClients?.value || '0',       change: stats.totalClients?.change || '0%',    up: stats.totalClients?.up ?? true,  icon: <MdPeople />,       color: 'purple', sub: 'registered users' },
+          { label: 'Renewals Due',      value: stats.renewalsDue?.value || '0',       change: stats.renewalsDue?.change || '0%',    up: stats.renewalsDue?.up ?? false, icon: <MdSchedule />,     color: 'rose',   sub: 'this month' },
+          { label: 'Claim Ratio',       value: stats.claimRatio?.value || '0%',      change: stats.claimRatio?.change || '0%',    up: stats.claimRatio?.up ?? true,  icon: <MdTrendingUp />,   color: 'cyan',   sub: 'settlement rate' },
         ].map((s) => (
           <div key={s.label} className={`stat-card ${s.color}`}>
             <div className="stat-card-top">

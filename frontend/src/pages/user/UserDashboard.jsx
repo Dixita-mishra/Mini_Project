@@ -90,11 +90,28 @@ const moreProductsData = {
     }
   ]
 };
-
 const UserDashboard = () => {
   const [selectedQuote, setSelectedQuote] = useState('home'); 
   const [showMoreProducts, setShowMoreProducts] = useState(false);
   const [activeTab, setActiveTab] = useState('Personal');
+
+  const handleQuoteSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch('http://localhost:5000/api/quotes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: selectedQuote })
+      });
+      const data = await response.json();
+      if(response.ok) {
+        alert(data.message + ' Quote ID: ' + data.data.quoteId);
+        setSelectedQuote(null);
+      }
+    } catch(err) {
+      alert('Failed to submit quote API');
+    }
+  };
 
   return (
     <div className="page-container" style={{ position: 'relative' }}>
@@ -192,8 +209,7 @@ const UserDashboard = () => {
             Get a quote
             <button onClick={() => setSelectedQuote(null)} style={{ background: 'transparent', fontSize: 20, color: 'var(--text-muted)' }}><MdClose /></button>
           </h2>
-
-          <form style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <form onSubmit={handleQuoteSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             {/* ... Get Quote Existing Fields ... */}
             <div style={{ display: 'flex', gap: 20 }}>
               <div style={{ flex: 1 }}>
@@ -225,7 +241,7 @@ const UserDashboard = () => {
               <span>I agree to the <a href="#" style={{ textDecoration: 'underline', color: 'var(--text-primary)', fontWeight: 600 }}>Terms of Use</a> and <a href="#" style={{ textDecoration: 'underline', color: 'var(--text-primary)', fontWeight: 600 }}>Privacy Policy</a></span>
             </label>
 
-            <button type="button" style={{
+            <button type="submit" style={{
               background: 'linear-gradient(135deg, #0284c7, #38bdf8)',
               color: '#fff',
               padding: '14px',

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MdAdd, MdEdit, MdDelete, MdVisibility, MdFilterList, MdDownload } from 'react-icons/md';
+import { usePortal } from '../../context/PortalContext';
 
 const initialPolicies = [];
 
@@ -116,9 +117,25 @@ const ViewModal = ({ policy, onClose }) => (
 
 const PolicyManagement = () => {
   const [policies, setPolicies] = useState(initialPolicies);
-  const [modal, setModal] = useState(null); // null | 'create' | 'edit' | 'view'
+  const [modal, setModal] = useState(null);
   const [selected, setSelected] = useState(null);
   const [filter, setFilter] = useState({ type: 'All', status: 'All', search: '' });
+  const { refreshKey } = usePortal();
+
+  useEffect(() => {
+    const fetchPolicies = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/admin/policies');
+        const data = await response.json();
+        if (response.ok) {
+          setPolicies(data.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch policies', err);
+      }
+    };
+    fetchPolicies();
+  }, [refreshKey]);
 
   const filtered = policies.filter(p => {
     if (filter.type !== 'All' && p.type !== filter.type) return false;
@@ -127,7 +144,16 @@ const PolicyManagement = () => {
     return true;
   });
 
-  const handleDelete = (id) => setPolicies(prev => prev.filter(p => p.id !== id));
+  const handleDelete = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/admin/policies/${id}`, { method: 'DELETE' });
+      if (response.ok) {
+        setPolicies(prev => prev.filter(p => p.id !== id));
+      }
+    } catch (err) {
+      console.error('Failed to delete policy', err);
+    }
+  };
 
   return (
     <div className="page-container">
