@@ -1,7 +1,50 @@
 import React, { useState } from 'react';
 import { MdDownload, MdRefresh, MdInfo } from 'react-icons/md';
 
-const myPolicies = [];
+const myPolicies = [
+  {
+    id: 'POL-100234',
+    name: 'Comprehensive Secure Motor',
+    type: 'Motor',
+    status: 'active',
+    icon: '🚗',
+    color: 'blue',
+    premium: '₹12,500',
+    coverage: '₹12,00,000',
+    start: '12 Jan 2024',
+    end: '11 Jan 2025',
+    agent: 'Rahul Sharma',
+    features: ['Zero Depreciation', '24x7 Roadside Assistance', 'Engine Cover', 'Cashless Repairs']
+  },
+  {
+    id: 'POL-900812',
+    name: 'Family Health Shield Plus',
+    type: 'Health',
+    status: 'active',
+    icon: '⚕️',
+    color: 'emerald',
+    premium: '₹34,000',
+    coverage: '₹1Cr',
+    start: '05 May 2024',
+    end: '04 May 2025',
+    agent: 'Priya Mehra',
+    features: ['No Room Rent Capping', 'Annual Health Checkups', 'Maternity Cover', 'Day Care Treatments']
+  },
+  {
+    id: 'POL-233911',
+    name: 'Standard Life Term Cover',
+    type: 'Life',
+    status: 'expired',
+    icon: '🏠',
+    color: 'amber',
+    premium: '₹14,200',
+    coverage: '₹50,00,000',
+    start: '18 Nov 2020',
+    end: '17 Nov 2023',
+    agent: 'Karan Patel',
+    features: ['Accidental Death Rider', 'Critical Illness Cover', 'Tax Benefits under 80C']
+  }
+];
 
 const DetailModal = ({ policy, onClose }) => (
   <div className="modal-overlay" onClick={onClose}>

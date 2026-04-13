@@ -9,6 +9,7 @@ import {
   MdCheckCircle, MdSchedule, MdWarning, MdFiberManualRecord
 } from 'react-icons/md';
 import Partners from '../../components/Partners';
+import Footer from '../../components/Footer';
 import { usePortal } from '../../context/PortalContext';
 
 const CustomTooltip = ({ active, payload, label }) => {
@@ -29,17 +30,41 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 const AdminDashboard = () => {
   const [dashboardData, setDashboardData] = useState({
-    revenueData: [],
-    policyTypeData: [],
-    recentActivity: [],
-    recentClaims: [],
+    revenueData: [
+      { month: 'Jan', revenue: 45000, claims: 12000, policies: 120 },
+      { month: 'Feb', revenue: 52000, claims: 15000, policies: 145 },
+      { month: 'Mar', revenue: 48000, claims: 22000, policies: 130 },
+      { month: 'Apr', revenue: 61000, claims: 18000, policies: 185 },
+      { month: 'May', revenue: 59000, claims: 14000, policies: 170 },
+      { month: 'Jun', revenue: 72000, claims: 25000, policies: 210 },
+      { month: 'Jul', revenue: 84000, claims: 19000, policies: 240 }
+    ],
+    policyTypeData: [
+      { name: 'Motor & Car', value: 42, color: '#3b82f6' },
+      { name: 'Health & Medical', value: 30, color: '#10b981' },
+      { name: 'Term Life', value: 18, color: '#f59e0b' },
+      { name: 'Property', value: 10, color: '#8b5cf6' }
+    ],
+    recentActivity: [
+      { title: 'New Motor Policy Issued to Aryan K.', time: '5 mins ago', color: '#10b981' },
+      { title: 'Claim CLM-8022 Approved', time: '12 mins ago', color: '#3b82f6' },
+      { title: 'Payment failed for Invoice #1920', time: '1 hour ago', color: '#ef4444' },
+      { title: 'Support Ticket #090 resolved', time: '2 hours ago', color: '#8b5cf6' },
+      { title: 'System Backup completed', time: '4 hours ago', color: '#64748b' }
+    ],
+    recentClaims: [
+      { id: 'CLM-8022', holder: 'Rohan Sharma', amount: '₹14,500', status: 'approved', date: 'Oct 24, 2025' },
+      { id: 'CLM-8023', holder: 'Priya Patel', amount: '₹8,200', status: 'pending', date: 'Oct 24, 2025' },
+      { id: 'CLM-8024', holder: 'Anil Gupta', amount: '₹42,000', status: 'rejected', date: 'Oct 23, 2025' },
+      { id: 'CLM-8025', holder: 'Meera Singh', amount: '₹5,500', status: 'approved', date: 'Oct 22, 2025' }
+    ],
     stats: {
-      totalPolicies: { value: '0', change: '0%', up: true },
-      totalRevenue: { value: '₹0', change: '0%', up: true },
-      activeClaims: { value: '0', change: '0%', up: false },
-      totalClients: { value: '0', change: '0%', up: true },
-      renewalsDue: { value: '0', change: '0%', up: false },
-      claimRatio: { value: '0%', change: '0%', up: true }
+      totalPolicies: { value: '4,892', change: '+14.2%', up: true },
+      totalRevenue: { value: '₹4.2M', change: '+8.4%', up: true },
+      activeClaims: { value: '143', change: '-2.1%', up: false },
+      totalClients: { value: '3,209', change: '+5.5%', up: true },
+      renewalsDue: { value: '84', change: '+12%', up: false },
+      claimRatio: { value: '64%', change: '-1.5%', up: true }
     }
   });
   const [loading, setLoading] = useState(true);
@@ -239,6 +264,11 @@ const AdminDashboard = () => {
       
       {/* Partners Grid */}
       <Partners />
+      
+      {/* Footer */}
+      <div style={{ margin: '40px -20px -20px -20px' }}>
+        <Footer />
+      </div>
     </div>
   );
 };

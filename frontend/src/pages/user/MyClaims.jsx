@@ -1,7 +1,38 @@
 import React, { useState } from 'react';
 import { MdAdd, MdUpload, MdCheckCircle, MdRadioButtonUnchecked } from 'react-icons/md';
 
-const myClaims = [];
+const myClaims = [
+  {
+    id: 'CLM-8022',
+    plan: 'Comprehensive Secure Motor',
+    type: 'Motor',
+    status: 'approved',
+    description: 'Vehicle damage due to rear-end collision at traffic signal. Front bumper needs complete replacement.',
+    amount: '₹14,500',
+    filed: '24 Oct 2025',
+    timeline: [
+      { label: 'Claim Filed', date: '24 Oct 2025', done: true, active: false },
+      { label: 'Under Review', date: '25 Oct 2025', done: true, active: false },
+      { label: 'Approved', date: '26 Oct 2025', done: true, active: true },
+      { label: 'Payment Disbursed', date: 'Processing', done: false, active: false }
+    ]
+  },
+  {
+    id: 'CLM-8023',
+    plan: 'Family Health Shield Plus',
+    type: 'Health',
+    status: 'pending',
+    description: 'Reimbursement for emergency hospitalization and diagnostic tests at Apollo Clinic.',
+    amount: '₹8,200',
+    filed: '24 Oct 2025',
+    timeline: [
+      { label: 'Claim Filed', date: '24 Oct 2025', done: true, active: false },
+      { label: 'Under Review', date: 'In Progress', done: true, active: true },
+      { label: 'Approved', date: 'Pending', done: false, active: false },
+      { label: 'Payment Disbursed', date: 'Pending', done: false, active: false }
+    ]
+  }
+];
 
 const NewClaimModal = ({ onClose }) => {
   const [step, setStep] = useState(1);

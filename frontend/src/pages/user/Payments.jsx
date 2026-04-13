@@ -1,9 +1,16 @@
 import React, { useState } from 'react';
 import { MdCreditCard, MdDownload, MdCheckCircle } from 'react-icons/md';
 
-const transactions = [];
+const transactions = [
+  { id: 'TXN-00192A', policy: 'POL-100234 (Motor)', amount: '₹12,500', date: 'Jan 12, 2024', method: 'Credit Card' },
+  { id: 'TXN-00918C', policy: 'POL-900812 (Health)', amount: '₹34,000', date: 'May 05, 2024', method: 'Net Banking' },
+  { id: 'TXN-00441B', policy: 'POL-233911 (Life)', amount: '₹14,200', date: 'Nov 18, 2022', method: 'UPI' }
+];
 
-const upcoming = [];
+const upcoming = [
+  { policy: 'POL-100234 - Comprehensive Secure Motor', amount: '₹12,500', due: 'Jan 11, 2025', urgent: true },
+  { policy: 'POL-900812 - Family Health Shield Plus', amount: '₹34,000', due: 'May 04, 2025', urgent: false }
+];
 
 const PayModal = ({ payment, onClose }) => (
   <div className="modal-overlay" onClick={onClose}>
@@ -54,13 +61,13 @@ const Payments = () => {
       <div className="payment-summary-card">
         <div>
           <div className="payment-total-label">Total Paid This Year</div>
-          <div className="payment-total-amount">₹0</div>
-          <div className="payment-total-sub">Across 0 insurance policies</div>
+          <div className="payment-total-amount">₹46,500</div>
+          <div className="payment-total-sub">Across 2 active insurance policies</div>
         </div>
         <div style={{ textAlign: 'right' }}>
           <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 4 }}>Next Payment Due</div>
-          <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--rose-light)' }}>₹0</div>
-          <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>No upcoming payments</div>
+          <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--rose-light)' }}>₹12,500</div>
+          <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>Due on Jan 11, 2025</div>
         </div>
       </div>
 

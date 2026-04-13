@@ -4,10 +4,10 @@ import { MdEdit, MdSave, MdCamera } from 'react-icons/md';
 const Profile = () => {
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
-    name: '', email: '', phone: '',
-    dob: '', gender: 'Male', address: '',
-    city: '', state: '', pincode: '', pan: '', aadhar: '',
-    nominee: '', nomineeRelation: 'Spouse',
+    name: 'Ayush Singh', email: 'ayush@example.com', phone: '+973 33101022',
+    dob: '1995-08-15', gender: 'Male', address: 'Flat 4B, Emerald Heights, City Center',
+    city: 'Manama', state: 'Capital Governorate', pincode: '302', pan: 'ABCDE1234F', aadhar: 'XXXX-XXXX-9876',
+    nominee: 'Priya Singh', nomineeRelation: 'Spouse',
   });
 
   const handleChange = (k, v) => setForm(p => ({ ...p, [k]: v }));
@@ -30,7 +30,7 @@ const Profile = () => {
       {/* Profile Header Card */}
       <div className="profile-header-card">
         <div style={{ position: 'relative' }}>
-          <div className="profile-avatar-lg">JS</div>
+          <div className="profile-avatar-lg">AS</div>
           {editing && (
             <div style={{ position: 'absolute', bottom: 0, right: 0, width: 26, height: 26, borderRadius: '50%', background: 'var(--blue-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '2px solid var(--bg-secondary)' }}>
               <MdCamera style={{ fontSize: 13, color: '#fff' }} />

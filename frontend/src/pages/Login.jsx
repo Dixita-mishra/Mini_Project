@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { MdPersonOutline, MdLockOutline, MdOutlineShield, MdArrowBack } from 'react-icons/md';
 import { usePortal } from '../context/PortalContext';
 
@@ -8,12 +8,12 @@ const Login = () => {
   const { switchPortal } = usePortal();
   
   const [formData, setFormData] = useState({ username: '', password: '' });
-  const [role] = useState('user'); // default role
+  const [role, setRole] = useState('user'); // Toggleable role
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('https://mini-project-g2lv.onrender.com/api/auth/login', {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: formData.username, password: formData.password, role })
@@ -21,14 +21,15 @@ const Login = () => {
       const data = await response.json();
       
       if (response.ok) {
+        localStorage.setItem('token', data.token);
         switchPortal(role);
-        navigate('/user/dashboard');
+        navigate(role === 'admin' ? '/admin/dashboard' : '/user/dashboard');
       } else {
         alert(data.message || 'Login failed');
       }
     } catch (error) {
       console.error('Login error:', error);
-      alert('Error connecting to server');
+      alert('Error connecting to server. Make sure the backend is running.');
     }
   };
 
@@ -71,7 +72,7 @@ const Login = () => {
           {/* Logo Top Left */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', position: 'absolute', top: 30, left: 30 }}>
              <MdOutlineShield style={{ fontSize: 22 }} />
-             <span style={{ fontSize: 16, fontWeight: 800, letterSpacing: '1px', textTransform: 'uppercase' }}>SOLIDARITY</span>
+             <span style={{ fontSize: 16, fontWeight: 800, letterSpacing: '1px', textTransform: 'uppercase' }}>EASYINSURE</span>
           </div>
 
           <h1 style={{ fontSize: '42px', fontWeight: 800, marginBottom: '20px', lineHeight: '1.1', maxWidth: '300px' }}>
@@ -105,7 +106,26 @@ const Login = () => {
           </button>
 
           <div style={{ marginBottom: '25px', marginTop: '10px' }}>
-            <h2 style={{ fontSize: '28px', fontWeight: 800, color: '#1f2937', marginBottom: '6px' }}>User Login</h2>
+            <h2 style={{ fontSize: '28px', fontWeight: 800, color: '#1f2937', marginBottom: '16px' }}>{role === 'admin' ? 'Admin Login' : 'User Login'}</h2>
+            
+            {/* Role Toggle Selector */}
+            <div style={{ display: 'flex', background: 'rgba(255,255,255,0.7)', borderRadius: '12px', padding: '4px', border: '1px solid rgba(0,0,0,0.05)', marginBottom: '16px' }}>
+              <button
+                type="button"
+                onClick={() => setRole('user')}
+                style={{ flex: 1, padding: '10px', borderRadius: '8px', border: 'none', background: role === 'user' ? '#fff' : 'transparent', color: role === 'user' ? '#11b2ac' : '#64748b', fontWeight: 700, fontSize: '13px', cursor: 'pointer', boxShadow: role === 'user' ? '0 2px 8px rgba(0,0,0,0.06)' : 'none', transition: 'all 0.2s' }}
+              >
+                User
+              </button>
+              <button
+                type="button"
+                onClick={() => setRole('admin')}
+                style={{ flex: 1, padding: '10px', borderRadius: '8px', border: 'none', background: role === 'admin' ? '#fff' : 'transparent', color: role === 'admin' ? '#11b2ac' : '#64748b', fontWeight: 700, fontSize: '13px', cursor: 'pointer', boxShadow: role === 'admin' ? '0 2px 8px rgba(0,0,0,0.06)' : 'none', transition: 'all 0.2s' }}
+              >
+                Admin
+              </button>
+            </div>
+
             <p style={{ fontSize: '13px', color: '#4b5563' }}>Enter your credentials to access your dashboard</p>
           </div>
 
@@ -177,8 +197,13 @@ const Login = () => {
                 boxShadow: '0 4px 12px rgba(17, 178, 172, 0.25)',
               }}
             >
-              SIGN IN AS USER
+              SIGN IN AS {role.toUpperCase()}
             </button>
+            
+            <div style={{ textAlign: 'center', marginTop: '10px', fontSize: '13px' }}>
+               <span style={{ color: '#4b5563' }}>Don't have an account? </span>
+               <Link to={`/register?role=${role}`} style={{ color: '#11b2ac', fontWeight: 600, textDecoration: 'none' }}>Register here</Link>
+            </div>
           </form>
         </div>
       </div>

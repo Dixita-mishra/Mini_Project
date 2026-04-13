@@ -3,9 +3,11 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-route
 import { PortalProvider } from './context/PortalContext';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
+import Chatbot from './components/Chatbot';
 
 // Public Pages
 import Login from './pages/Login';
+import Register from './pages/Register';
 
 // Admin Pages
 import AdminDashboard   from './pages/admin/AdminDashboard';
@@ -23,6 +25,15 @@ import MyClaims      from './pages/user/MyClaims';
 import Payments      from './pages/user/Payments';
 import Profile       from './pages/user/Profile';
 import Support       from './pages/user/Support';
+
+// Security Guard Wrapper
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
 
 const AppShell = () => {
   const location = useLocation();
@@ -65,6 +76,9 @@ const AppShell = () => {
           <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
         </Routes>
       </div>
+
+      {/* Render Chatbot only for user routes */}
+      {location.pathname.startsWith('/user') && <Chatbot />}
     </div>
   );
 };
@@ -73,8 +87,12 @@ const App = () => (
   <PortalProvider>
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/*" element={<AppShell />} />
+        <Route path="/register" element={<Register />} />
+        
+        {/* Core application routes are exclusively protected */}
+        <Route path="/*" element={<ProtectedRoute><AppShell /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   </PortalProvider>

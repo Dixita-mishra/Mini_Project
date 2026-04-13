@@ -4,6 +4,7 @@ import {
   MdShield, MdHealthAndSafety, MdLaptopMac, MdClose
 } from 'react-icons/md';
 import Partners from '../../components/Partners';
+import Footer from '../../components/Footer';
 
 const insurances = [
   { id: 'motor', title: 'Motor & Car Insurance', icon: <MdDirectionsCar style={{ color: '#f87171' }} /> },
@@ -122,7 +123,7 @@ const UserDashboard = () => {
             <span>Main Services</span> <span style={{ color: 'var(--text-secondary)' }}>/</span> <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Insurance Policies</span>
           </div>
           <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 8 }}>Insurance Policies</h1>
-          <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>Look through all the insurance policies and services we provide at Solidarity</p>
+          <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>Look through all the insurance policies and services we provide at EasyInsure</p>
         </div>
         <button 
           onClick={() => setShowMoreProducts(true)}
@@ -214,13 +215,13 @@ const UserDashboard = () => {
             <div style={{ display: 'flex', gap: 20 }}>
               <div style={{ flex: 1 }}>
                 <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 8 }}>Name</label>
-                <input type="text" placeholder="e.g. John Doe" style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid var(--border)', fontSize: 13, background: '#f8fafc' }} />
+                <input type="text" defaultValue="Ayush Singh" placeholder="e.g. John Doe" style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid var(--border)', fontSize: 13, background: '#f8fafc', color: '#0f172a', fontWeight: 500 }} />
               </div>
               <div style={{ flex: 1 }}>
                 <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 8 }}>Mobile Number</label>
                 <div style={{ display: 'flex', gap: 8 }}>
                   <input type="text" value="+973" readOnly style={{ width: 60, padding: '10px', borderRadius: 8, border: '1px solid var(--border)', fontSize: 13, background: '#f8fafc', color: 'var(--text-muted)', textAlign: 'center' }} />
-                  <input type="text" placeholder="e.g 33101022" style={{ flex: 1, padding: '10px 14px', borderRadius: 8, border: '1px solid var(--border)', fontSize: 13, background: '#f8fafc' }} />
+                  <input type="text" defaultValue="33101022" placeholder="e.g 33101022" style={{ flex: 1, padding: '10px 14px', borderRadius: 8, border: '1px solid var(--border)', fontSize: 13, background: '#f8fafc', color: '#0f172a', fontWeight: 500 }} />
                 </div>
               </div>
             </div>
@@ -228,11 +229,11 @@ const UserDashboard = () => {
             <div style={{ display: 'flex', gap: 20 }}>
               <div style={{ flex: 1.5 }}>
                 <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 8 }}>Sum insured of the building (BHD)</label>
-                <input type="number" placeholder="BHD" style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid var(--border)', fontSize: 13, background: '#f8fafc' }} />
+                <input type="number" defaultValue={250000} placeholder="BHD" style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid var(--border)', fontSize: 13, background: '#f8fafc', color: '#0f172a', fontWeight: 500 }} />
               </div>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 8 }}>Building Age</label>
-                <input type="number" placeholder="e.g. 10" style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid var(--border)', fontSize: 13, background: '#f8fafc' }} />
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 8 }}>Building Age (Years)</label>
+                <input type="number" defaultValue={8} placeholder="e.g. 10" style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid var(--border)', fontSize: 13, background: '#f8fafc', color: '#0f172a', fontWeight: 500 }} />
               </div>
             </div>
 
@@ -352,6 +353,11 @@ const UserDashboard = () => {
 
       {/* Partners Grid */}
       <Partners />
+      
+      {/* Footer */}
+      <div style={{ margin: '40px -20px -20px -20px' }}>
+        <Footer />
+      </div>
     </div>
   );
 };
