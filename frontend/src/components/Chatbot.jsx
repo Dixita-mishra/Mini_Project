@@ -43,7 +43,7 @@ const Chatbot = () => {
         try {
           // Pointing to local backend url for dev, adjust to production if needed
           // Using production url since other parts of the app are using it based on recent history
-          const apiUrl = 'http://localhost:5000/api/chat/ticket'; 
+          const apiUrl = 'https://mini-project-g2lv.onrender.com/api/chat/ticket'; 
           // Note: if connection fails, it might be because the backend is hosted on render
           // The instructions say use `http://localhost:5000` for the backend, but since the user previously 
           // updated URLs to render, I'll provide a fallback or use relative path logic if proxy is set.

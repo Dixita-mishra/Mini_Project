@@ -23,7 +23,7 @@ const Register = () => {
     const roleParam = searchParams.get('role') || 'user';
     
     try {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
+      const response = await fetch('https://mini-project-g2lv.onrender.com/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...formData, role: roleParam })
