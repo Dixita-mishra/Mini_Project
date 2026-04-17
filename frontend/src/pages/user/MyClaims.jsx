@@ -1,40 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { getUserData, saveUserData } from '../../utils/storage';
 import { MdAdd, MdUpload, MdCheckCircle, MdRadioButtonUnchecked } from 'react-icons/md';
 
-const myClaims = [
-  {
-    id: 'CLM-8022',
-    plan: 'Comprehensive Secure Motor',
-    type: 'Motor',
-    status: 'approved',
-    description: 'Vehicle damage due to rear-end collision at traffic signal. Front bumper needs complete replacement.',
-    amount: '₹14,500',
-    filed: '24 Oct 2025',
-    timeline: [
-      { label: 'Claim Filed', date: '24 Oct 2025', done: true, active: false },
-      { label: 'Under Review', date: '25 Oct 2025', done: true, active: false },
-      { label: 'Approved', date: '26 Oct 2025', done: true, active: true },
-      { label: 'Payment Disbursed', date: 'Processing', done: false, active: false }
-    ]
-  },
-  {
-    id: 'CLM-8023',
-    plan: 'Family Health Shield Plus',
-    type: 'Health',
-    status: 'pending',
-    description: 'Reimbursement for emergency hospitalization and diagnostic tests at Apollo Clinic.',
-    amount: '₹8,200',
-    filed: '24 Oct 2025',
-    timeline: [
-      { label: 'Claim Filed', date: '24 Oct 2025', done: true, active: false },
-      { label: 'Under Review', date: 'In Progress', done: true, active: true },
-      { label: 'Approved', date: 'Pending', done: false, active: false },
-      { label: 'Payment Disbursed', date: 'Pending', done: false, active: false }
-    ]
-  }
-];
 
-const NewClaimModal = ({ onClose }) => {
+
+
+const NewClaimModal = ({ onClose, onSubmit, policies }) => {
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({ policy: '', type: '', amount: '', description: '' });
 
@@ -61,11 +32,20 @@ const NewClaimModal = ({ onClose }) => {
             <>
               <div className="form-group">
                 <label className="form-label">Select Policy</label>
-                <select className="form-select" value={form.policy} onChange={e => setForm({ ...form, policy: e.target.value })}>
-                  <option value="">— Choose a policy —</option>
-                  <option value="POL-2891">POL-2891 · Health Plus Pro</option>
-                  <option value="POL-2856">POL-2856 · Life Shield Premium</option>
-                </select>
+                <select
+                    className="form-select"
+                    value={form.policy}
+                    onChange={e => setForm({ ...form, policy: e.target.value })}
+                    >
+
+                      <option value="">— Choose a policy —</option>
+                      {policies.map((p) => (
+                      <option key={p.id} value={p.name}>
+                         {p.name}
+                    </option>
+                  ))}
+
+               </select>
               </div>
               <div className="form-group">
                 <label className="form-label">Claim Type</label>
@@ -112,7 +92,18 @@ const NewClaimModal = ({ onClose }) => {
           <button className="btn btn-secondary" onClick={onClose}>Cancel</button>
           {step < 3
             ? <button className="btn btn-primary" onClick={() => setStep(s => s + 1)}>Next →</button>
-            : <button className="btn btn-success" onClick={onClose}><MdCheckCircle /> Submit Claim</button>
+            : <button
+            className="btn btn-success"
+            onClick={() => {
+              if (!form.policy || !form.type || !form.amount || !form.description) {
+                alert("Please fill all claim details");
+                return;
+              }
+              onSubmit(form);
+            }}
+          >
+            <MdCheckCircle /> Submit Claim
+          </button>
           }
         </div>
       </div>
@@ -122,13 +113,54 @@ const NewClaimModal = ({ onClose }) => {
 
 const MyClaims = () => {
   const [modal, setModal] = useState(false);
+  const [claims, setClaims] = useState([]);
+  const [policies, setPolicies] = useState([]);
+
+  useEffect(() => {
+    const data = getUserData();
+    setClaims(data.claims || []);
+    setPolicies(data.policies || []);
+  }, []);
+
+  const handleSubmitClaim = (form) => {
+    const data = getUserData();
+  
+    const newClaim = {
+      id: `CLM-${Date.now()}`,
+      plan: form.policy,
+      type: form.type,
+      status: 'pending',
+      description: form.description,
+      amount: `₹${form.amount}`,
+      filed: new Date().toLocaleDateString(),
+      timeline: [
+        { label: 'Claim Filed', date: new Date().toLocaleDateString(), done: true, active: false },
+        { label: 'Under Review', date: 'In Progress', done: true, active: true },
+        { label: 'Approved', date: 'Pending', done: false, active: false },
+        { label: 'Payment Disbursed', date: 'Pending', done: false, active: false }
+      ]
+    };
+  
+    data.claims.unshift(newClaim);
+  
+    data.notifications.unshift({
+      id: Date.now(),
+      message: `Claim submitted for ${form.policy}`,
+      time: new Date().toLocaleString()
+    });
+  
+    saveUserData(data);
+    setClaims(data.claims);
+    setModal(false);
+    alert("Claim submitted successfully");
+  };
 
   return (
     <div className="page-container">
       <div className="page-header">
         <div className="page-header-left">
           <h1>My Claims</h1>
-          <p>{myClaims.length} total claims · {myClaims.filter(c => c.status === 'approved').length} approved</p>
+          <p>{claims.length} total claims · {claims.filter(c => c.status === 'approved').length} approved</p>
         </div>
         <div className="page-header-actions">
           <button className="btn btn-primary" onClick={() => setModal(true)}><MdAdd /> File New Claim</button>
@@ -136,7 +168,7 @@ const MyClaims = () => {
       </div>
 
       {/* Claims */}
-      {myClaims.map(c => (
+      {claims.map(c => (
         <div key={c.id} className="chart-card" style={{ marginBottom: 20 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
             <div>
@@ -171,7 +203,7 @@ const MyClaims = () => {
       ))}
 
       {/* Empty if no claims */}
-      {myClaims.length === 0 && (
+      {claims.length === 0 && (
         <div className="chart-card">
           <div className="empty-state">
             <div className="empty-state-icon">📋</div>
@@ -182,7 +214,13 @@ const MyClaims = () => {
         </div>
       )}
 
-      {modal && <NewClaimModal onClose={() => setModal(false)} />}
+    {modal && (
+       <NewClaimModal
+        onClose={() => setModal(false)}
+        onSubmit={handleSubmitClaim}
+        policies={policies}
+       />
+      )}
     </div>
   );
 };

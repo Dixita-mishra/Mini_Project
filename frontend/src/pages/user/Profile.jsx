@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { getUserData, saveUserData } from '../../utils/storage';
 import { MdEdit, MdSave, MdCamera } from 'react-icons/md';
 
 const Profile = () => {
@@ -12,6 +13,44 @@ const Profile = () => {
 
   const handleChange = (k, v) => setForm(p => ({ ...p, [k]: v }));
 
+  const handleSave = () => {
+    const data = getUserData();
+  
+    data.profile = form;
+  
+    data.notifications.unshift({
+      id: Date.now(),
+      message: "Profile updated successfully",
+      time: new Date().toLocaleString(),
+    });
+  
+    saveUserData(data);
+    setEditing(false);
+    alert("Profile saved successfully");
+  };
+
+  useEffect(() => {
+    const data = getUserData();
+  
+    if (data.profile) {
+      setForm({
+        name: data.profile.name || '',
+        email: data.profile.email || '',
+        phone: data.profile.phone || '',
+        dob: data.profile.dob || '',
+        gender: data.profile.gender || '',
+        address: data.profile.address || '',
+        city: data.profile.city || '',
+        state: data.profile.state || '',
+        pincode: data.profile.pincode || '',
+        pan: data.profile.pan || '',
+        aadhar: data.profile.aadhar || '',
+        nominee: data.profile.nominee || '',
+        nomineeRelation: data.profile.nomineeRelation || '',
+      });
+    }
+  }, []);
+
   return (
     <div className="page-container">
       <div className="page-header">
@@ -21,7 +60,9 @@ const Profile = () => {
         </div>
         <div className="page-header-actions">
           {editing
-            ? <button className="btn btn-success" onClick={() => setEditing(false)}><MdSave /> Save Changes</button>
+            ? <button className="btn btn-success" onClick={handleSave}>
+            <MdSave /> Save Changes
+          </button>
             : <button className="btn btn-primary" onClick={() => setEditing(true)}><MdEdit /> Edit Profile</button>
           }
         </div>
@@ -30,7 +71,17 @@ const Profile = () => {
       {/* Profile Header Card */}
       <div className="profile-header-card">
         <div style={{ position: 'relative' }}>
-          <div className="profile-avatar-lg">AS</div>
+        <div className="profile-avatar-lg">
+
+         {form.name
+          ? form.name
+           .split(" ")
+           .map((word) => word[0])
+           .join("")
+           .slice(0, 2)
+           .toUpperCase()
+          : "U"}
+        </div>
           {editing && (
             <div style={{ position: 'absolute', bottom: 0, right: 0, width: 26, height: 26, borderRadius: '50%', background: 'var(--blue-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '2px solid var(--bg-secondary)' }}>
               <MdCamera style={{ fontSize: 13, color: '#fff' }} />
