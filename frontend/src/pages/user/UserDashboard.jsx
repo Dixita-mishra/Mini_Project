@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+
+import React, { useEffect, useState } from "react";
+import { getUserData } from "../../utils/storage";
 import { 
   MdDirectionsCar, MdHome, MdFlight, MdFace, 
   MdShield, MdHealthAndSafety, MdLaptopMac, MdClose
@@ -92,9 +94,37 @@ const moreProductsData = {
   ]
 };
 const UserDashboard = () => {
+  const [profileName, setProfileName] = useState("");
+  const [totalPolicies, setTotalPolicies] = useState(0);
+  const [activePolicies, setActivePolicies] = useState(0);
+  const [totalClaims, setTotalClaims] = useState(0);
+  const [approvedClaims, setApprovedClaims] = useState(0);
   const [selectedQuote, setSelectedQuote] = useState('home'); 
   const [showMoreProducts, setShowMoreProducts] = useState(false);
   const [activeTab, setActiveTab] = useState('Personal');
+
+
+  useEffect(() => {
+    const data = getUserData();
+  
+    const policies = data.policies || [];
+    const claims = data.claims || [];
+    const profile = data.profile || {};
+  
+    setProfileName(profile.name || profile.fullName || "User");
+  
+    setTotalPolicies(policies.length);
+  
+    setActivePolicies(
+      policies.filter((p) => p.status === "active").length
+    );
+  
+    setTotalClaims(claims.length);
+  
+    setApprovedClaims(
+      claims.filter((c) => c.status === "approved").length
+    );
+  }, []); 
 
   const handleQuoteSubmit = async (e) => {
     e.preventDefault();
@@ -122,6 +152,7 @@ const UserDashboard = () => {
           <div style={{ display: 'flex', gap: 5, fontSize: 13, color: 'var(--text-muted)', marginBottom: 12 }}>
             <span>Main Services</span> <span style={{ color: 'var(--text-secondary)' }}>/</span> <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Insurance Policies</span>
           </div>
+          <h2 style={{ fontSize: 18, marginBottom: 10 }}> Welcome, {profileName}</h2>
           <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 8 }}>Insurance Policies</h1>
           <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>Look through all the insurance policies and services we provide at EasyInsure</p>
         </div>
@@ -146,6 +177,33 @@ const UserDashboard = () => {
           View More Products
         </button>
       </div>
+
+      <div style={{
+  display: "grid",
+  gridTemplateColumns: "repeat(4, 1fr)",
+  gap: "15px",
+  marginBottom: "20px"
+}}>
+  <div className="chart-card">
+    <h4>Total Policies</h4>
+    <h2>{totalPolicies}</h2>
+  </div>
+
+  <div className="chart-card">
+    <h4>Active Policies</h4>
+    <h2>{activePolicies}</h2>
+  </div>
+
+  <div className="chart-card">
+    <h4>Total Claims</h4>
+    <h2>{totalClaims}</h2>
+  </div>
+
+  <div className="chart-card">
+    <h4>Approved Claims</h4>
+    <h2>{approvedClaims}</h2>
+  </div>
+</div>
 
       {/* Grid of Insurances */}
       <div style={{
