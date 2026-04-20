@@ -6,9 +6,9 @@ const initialPolicies = [];
 
 const typeColors = { Health: 'green', Life: 'blue', Auto: 'amber', Home: 'purple', Travel: 'cyan' };
 
-const PolicyModal = ({ policy, onClose }) => {
+const PolicyModal = ({ policy, onClose, onSave }) => {
   const isEdit = !!policy;
-  const [form, setForm] = useState(policy || { holder: '', type: 'Health', plan: '', premium: '', coverage: '', agent: '', status: 'active' });
+  const [form, setForm] = useState(policy || { holder: '', type: 'Health', plan: '', premium: '', coverage: '', start: '', end: '', agent: 'Ravi Kumar', status: 'active' });
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -47,11 +47,11 @@ const PolicyModal = ({ policy, onClose }) => {
           <div className="form-row">
             <div className="form-group">
               <label className="form-label">Start Date</label>
-              <input className="form-input" type="date" />
+              <input className="form-input" type="date" value={form.start} onChange={e => setForm({ ...form, start: e.target.value })} />
             </div>
             <div className="form-group">
               <label className="form-label">End Date</label>
-              <input className="form-input" type="date" />
+              <input className="form-input" type="date" value={form.end} onChange={e => setForm({ ...form, end: e.target.value })} />
             </div>
           </div>
           <div className="form-row">
@@ -76,7 +76,7 @@ const PolicyModal = ({ policy, onClose }) => {
         </div>
         <div className="modal-footer">
           <button className="btn btn-secondary" onClick={onClose}>Cancel</button>
-          <button className="btn btn-primary" onClick={onClose}>
+          <button className="btn btn-primary" onClick={() => onSave(form)}>
             {isEdit ? 'Save Changes' : 'Create Policy'}
           </button>
         </div>
@@ -122,31 +122,51 @@ const PolicyManagement = () => {
   const [filter, setFilter] = useState({ type: 'All', status: 'All', search: '' });
   const { refreshKey } = usePortal();
 
-  useEffect(() => {
-    const fetchPolicies = async () => {
-      try {
-        const response = await fetch('https://mini-project-g2lv.onrender.com/api/admin/policies');
-        const data = await response.json();
-        if (response.ok) {
-          setPolicies(data.data);
-        }
-      } catch (err) {
-        console.error('Failed to fetch policies', err);
+  const fetchPolicies = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/admin/policies');
+      const data = await response.json();
+      if (response.ok) {
+        setPolicies(data.data);
       }
-    };
+    } catch (err) {
+      console.error('Failed to fetch policies', err);
+    }
+  };
+
+  useEffect(() => {
     fetchPolicies();
   }, [refreshKey]);
 
   const filtered = policies.filter(p => {
-    if (filter.type !== 'All' && p.type !== filter.type) return false;
-    if (filter.status !== 'All' && p.status !== filter.status) return false;
-    if (filter.search && !p.holder.toLowerCase().includes(filter.search.toLowerCase()) && !p.id.toLowerCase().includes(filter.search.toLowerCase())) return false;
+    if (filter.type !== 'All' && !p.type?.toLowerCase().includes(filter.type.toLowerCase())) return false;
+    if (filter.status !== 'All' && p.status?.toLowerCase() !== filter.status.toLowerCase()) return false;
+    if (filter.search && !p.holder?.toLowerCase().includes(filter.search.toLowerCase()) && !p.id?.toLowerCase().includes(filter.search.toLowerCase())) return false;
     return true;
   });
 
-  const handleDelete = async (id) => {
+  const handleSave = async (form) => {
     try {
-      const response = await fetch(`https://mini-project-g2lv.onrender.com/api/admin/policies/${id}`, { method: 'DELETE' });
+      const url = `http://localhost:5000/api/admin/policies${selected ? '/' + selected.id : ''}`;
+      const response = await fetch(url, {
+        method: selected ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form)
+      });
+      if (response.ok) {
+        setModal(null);
+        setSelected(null);
+        fetchPolicies();
+      }
+    } catch (err) {
+      console.error('Failed to save policy', err);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this policy?')) return;
+    try {
+      const response = await fetch(`http://localhost:5000/api/admin/policies/${id}`, { method: 'DELETE' });
       if (response.ok) {
         setPolicies(prev => prev.filter(p => p.id !== id));
       }
@@ -164,7 +184,7 @@ const PolicyManagement = () => {
         </div>
         <div className="page-header-actions">
           <button className="btn btn-secondary"><MdDownload /> Export</button>
-          <button className="btn btn-primary" onClick={() => setModal('create')}><MdAdd /> New Policy</button>
+          <button className="btn btn-primary" onClick={() => { setSelected(null); setModal('create'); }}><MdAdd /> New Policy</button>
         </div>
       </div>
 
@@ -250,8 +270,8 @@ const PolicyManagement = () => {
         )}
       </div>
 
-      {modal === 'create' && <PolicyModal onClose={() => setModal(null)} />}
-      {modal === 'edit' && <PolicyModal policy={selected} onClose={() => setModal(null)} />}
+      {modal === 'create' && <PolicyModal onClose={() => { setModal(null); setSelected(null); }} onSave={handleSave} />}
+      {modal === 'edit' && <PolicyModal policy={selected} onClose={() => { setModal(null); setSelected(null); }} onSave={handleSave} />}
       {modal === 'view' && <ViewModal policy={selected} onClose={() => setModal(null)} />}
     </div>
   );

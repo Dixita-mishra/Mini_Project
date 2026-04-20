@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MdSave, MdNotifications, MdSecurity, MdPalette, MdBusiness, MdEmail } from 'react-icons/md';
 
-const API = 'https://mini-project-g2lv.onrender.com/api/admin';
+const API = 'http://localhost:5000/api/admin';
 const sections = ['General', 'Notifications', 'Security', 'Appearance', 'Email Templates', 'Billing'];
 
 const Settings = () => {
@@ -17,7 +17,7 @@ const Settings = () => {
   });
   const [company, setCompany] = useState({ name: 'InsureIQ Pvt. Ltd.', email: 'admin@insureiq.com', phone: '+91 98100 00000', address: '12, Insurance Tower, BKC, Mumbai – 400051', website: 'www.insureiq.com', gstin: '27AABCI1234A1Z5' });
   const [appearance, setAppearance] = useState({ accentColor: '#3b82f6', sidebarWidth: 'Default (260px)' });
-  const [password, setPassword] = useState({ newPassword: '', confirmPassword: '' });
+  const [password, setPassword] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
   const [pwdMsg, setPwdMsg] = useState('');
 
   useEffect(() => {
@@ -68,7 +68,7 @@ const Settings = () => {
       });
       const data = await res.json();
       setPwdMsg(res.ok ? '✓ ' + data.message : '✗ ' + (data.message || 'Error'));
-      if (res.ok) setPassword({ newPassword: '', confirmPassword: '' });
+      if (res.ok) setPassword({ currentPassword: '', newPassword: '', confirmPassword: '' });
     } catch (e) {
       setPwdMsg('Failed to connect to server');
     } finally {
@@ -76,9 +76,24 @@ const Settings = () => {
     }
   };
 
+  const handleToggleChange = async (k) => {
+    const newVal = !toggles[k];
+    const newToggles = { ...toggles, [k]: newVal };
+    setToggles(newToggles);
+    try {
+      await fetch(`${API}/settings`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ toggles: newToggles })
+      });
+    } catch(e) {
+      console.error('Failed to auto-save toggle');
+    }
+  };
+
   const Toggle = ({ k }) => (
     <label className="toggle-switch">
-      <input type="checkbox" checked={toggles[k]} onChange={() => setToggles(p => ({ ...p, [k]: !p[k] }))} />
+      <input type="checkbox" checked={toggles[k]} onChange={() => handleToggleChange(k)} />
       <span className="toggle-slider" />
     </label>
   );
@@ -216,6 +231,7 @@ const Settings = () => {
               </div>
               <div className="form-group" style={{ marginTop: 20 }}>
                 <label className="form-label">Change Admin Password</label>
+                <input className="form-input" type="password" placeholder="Current password" style={{ marginBottom: 10 }} value={password.currentPassword} onChange={e => setPassword({ ...password, currentPassword: e.target.value })} />
                 <input className="form-input" type="password" placeholder="New password" style={{ marginBottom: 10 }} value={password.newPassword} onChange={e => setPassword({ ...password, newPassword: e.target.value })} />
                 <input className="form-input" type="password" placeholder="Confirm new password" value={password.confirmPassword} onChange={e => setPassword({ ...password, confirmPassword: e.target.value })} />
               </div>
