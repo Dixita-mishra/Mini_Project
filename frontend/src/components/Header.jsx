@@ -3,7 +3,7 @@ import { MdSearch, MdNotifications, MdRefresh, MdFullscreen, MdMenu, MdClose, Md
 import { usePortal } from '../context/PortalContext';
 import { useNavigate } from 'react-router-dom';
 
-const API = 'https://mini-project-g2lv.onrender.com/api/admin';
+const API = 'http://localhost:5000/api/admin';
 
 const pageMeta = {
   '/admin/dashboard':  { title: 'Dashboard', subtitle: 'Welcome back, Admin! Here\'s what\'s happening today.' },
@@ -153,13 +153,9 @@ const Header = ({ currentPath, onMenuClick }) => {
         setUnreadCount(notifs.length);
       }
     } catch (e) {
-      setNotifications([
-        { id: 0, title: 'New policy issued: AUTO-892', time: '5 mins ago', color: '#10b981', read: false },
-        { id: 1, title: 'Claim CLM-419 approved', time: '12 mins ago', color: '#3b82f6', read: false },
-        { id: 2, title: 'New user registration', time: '1 hour ago', color: '#8b5cf6', read: false },
-        { id: 3, title: 'Payment failed for HLT-223', time: '2 hours ago', color: '#ef4444', read: false },
-      ]);
-      setUnreadCount(4);
+      console.error('Failed to fetch notifications', e);
+      setNotifications([]);
+      setUnreadCount(0);
     }
   };
 

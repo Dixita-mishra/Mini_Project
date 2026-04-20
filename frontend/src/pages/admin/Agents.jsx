@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MdAdd, MdEdit, MdStar, MdStarBorder, MdPhone, MdEmail, MdLocationOn, MdTrendingUp } from 'react-icons/md';
+import { MdAdd, MdEdit, MdDelete, MdStar, MdStarBorder, MdPhone, MdEmail, MdLocationOn, MdTrendingUp } from 'react-icons/md';
 import { usePortal } from '../../context/PortalContext';
 
 const initialAgents = [];
@@ -14,8 +14,8 @@ const AgentModal = ({ agent, onClose, onSave }) => {
     setLoading(true);
     try {
       const url = agent 
-        ? `https://mini-project-g2lv.onrender.com/api/admin/agents/${agent.id}`
-        : 'https://mini-project-g2lv.onrender.com/api/admin/agents';
+        ? `http://localhost:5000/api/admin/agents/${agent.id}`
+        : 'http://localhost:5000/api/admin/agents';
       const method = agent ? 'PUT' : 'POST';
       
       const response = await fetch(url, {
@@ -95,7 +95,7 @@ const Agents = () => {
   useEffect(() => {
     const fetchAgents = async () => {
       try {
-        const response = await fetch('https://mini-project-g2lv.onrender.com/api/admin/agents');
+        const response = await fetch('http://localhost:5000/api/admin/agents');
         const data = await response.json();
         if (response.ok) {
           setAgents(data.data);
@@ -114,6 +114,19 @@ const Agents = () => {
       setAgents(agents.map(a => a.id === savedAgent.id ? savedAgent : a));
     } else {
       setAgents([...agents, savedAgent]);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this agent?")) {
+      try {
+        const res = await fetch(`http://localhost:5000/api/admin/agents/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          setAgents(agents.filter(a => a.id !== id));
+        }
+      } catch (err) {
+        console.error('Failed to delete agent', err);
+      }
     }
   };
 
@@ -207,9 +220,14 @@ const Agents = () => {
               ))}
             </div>
 
-            <button className="btn btn-secondary btn-sm" style={{ width: '100%', justifyContent: 'center' }} onClick={() => { setSelected(a); setModal('edit'); }}>
-              <MdEdit /> Edit Agent
-            </button>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button className="btn btn-secondary btn-sm" style={{ flex: 1, justifyContent: 'center' }} onClick={() => { setSelected(a); setModal('edit'); }}>
+                <MdEdit /> Edit Agent
+              </button>
+              <button className="btn btn-danger btn-sm" style={{ flex: 1, justifyContent: 'center' }} onClick={() => handleDelete(a.id)}>
+                <MdDelete /> Delete
+              </button>
+            </div>
           </div>
         ))}
       </div>
