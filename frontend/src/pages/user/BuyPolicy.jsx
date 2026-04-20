@@ -54,3 +54,4 @@ const BuyPolicy = () => {
 };
 
 export default BuyPolicy;
+

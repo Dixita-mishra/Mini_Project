@@ -4,6 +4,67 @@ import { usePortal } from '../../context/PortalContext';
 
 const initialClaims = [];
 
+const NewClaimModal = ({ isOpen, onClose, data, setData, onSubmit }) => {
+  if (!isOpen) return null;
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" style={{ maxWidth: '500px' }} onClick={e => e.stopPropagation()}>
+        <div className="modal-header">
+          <span className="modal-title">New Claim</span>
+          <button className="modal-close" onClick={onClose}>×</button>
+        </div>
+        <form onSubmit={onSubmit}>
+          <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: 13, color: 'var(--text-muted)' }}>Holder Name</label>
+                <input required style={{ width: '100%', padding: '8px', marginTop: '4px', border: '1px solid rgba(0,0,0,0.1)', borderRadius: '6px', fontSize: 13 }} value={data.holder} onChange={e => setData({ ...data, holder: e.target.value })} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: 13, color: 'var(--text-muted)' }}>Policy ID</label>
+                <input required style={{ width: '100%', padding: '8px', marginTop: '4px', border: '1px solid rgba(0,0,0,0.1)', borderRadius: '6px', fontSize: 13 }} value={data.policy} placeholder="e.g. POL-1004" onChange={e => setData({ ...data, policy: e.target.value })} />
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: 13, color: 'var(--text-muted)' }}>Claim Type</label>
+                <select style={{ width: '100%', padding: '8px', marginTop: '4px', border: '1px solid rgba(0,0,0,0.1)', borderRadius: '6px', fontSize: 13 }} value={data.type} onChange={e => setData({ ...data, type: e.target.value })}>
+                  <option value="Health">Health</option>
+                  <option value="Auto">Auto</option>
+                  <option value="Life">Life</option>
+                  <option value="Home">Home</option>
+                </select>
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: 13, color: 'var(--text-muted)' }}>Claim Amount</label>
+                <input required style={{ width: '100%', padding: '8px', marginTop: '4px', border: '1px solid rgba(0,0,0,0.1)', borderRadius: '6px', fontSize: 13 }} value={data.amount} placeholder="e.g. ₹50,000" onChange={e => setData({ ...data, amount: e.target.value })} />
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: 13, color: 'var(--text-muted)' }}>Filed Date</label>
+                <input type="date" required style={{ width: '100%', padding: '8px', marginTop: '4px', border: '1px solid rgba(0,0,0,0.1)', borderRadius: '6px', fontSize: 13 }} value={data.filed} onChange={e => setData({ ...data, filed: e.target.value })} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: 13, color: 'var(--text-muted)' }}>Agent Name</label>
+                <input required style={{ width: '100%', padding: '8px', marginTop: '4px', border: '1px solid rgba(0,0,0,0.1)', borderRadius: '6px', fontSize: 13 }} value={data.agent} onChange={e => setData({ ...data, agent: e.target.value })} />
+              </div>
+            </div>
+            <div>
+              <label style={{ fontSize: 13, color: 'var(--text-muted)' }}>Reason / Description</label>
+              <textarea required style={{ width: '100%', padding: '8px', marginTop: '4px', border: '1px solid rgba(0,0,0,0.1)', borderRadius: '6px', fontSize: 13 }} rows="3" value={data.reason} onChange={e => setData({ ...data, reason: e.target.value })} />
+            </div>
+          </div>
+          <div className="modal-footer">
+            <button type="button" className="btn btn-secondary" onClick={onClose}>Cancel</button>
+            <button type="submit" className="btn btn-primary"><MdAdd style={{ marginRight: 4 }} /> Submit Claim</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 const ClaimDetailModal = ({ claim, onClose, onApprove, onReject }) => (
   <div className="modal-overlay" onClick={onClose}>
     <div className="modal" onClick={e => e.stopPropagation()}>
@@ -53,10 +114,12 @@ const ClaimsManagement = () => {
   const [claims, setClaims] = useState(initialClaims);
   const [selected, setSelected] = useState(null);
   const [filter, setFilter] = useState({ status: 'All', type: 'All', search: '' });
+  const [isNewClaimOpen, setIsNewClaimOpen] = useState(false);
+  const [newClaimData, setNewClaimData] = useState({ holder: '', policy: '', type: 'Health', amount: '', filed: '', agent: '', reason: '' });
   const { refreshKey } = usePortal();
 
   useEffect(() => {
-    fetch('https://mini-project-g2lv.onrender.com/api/admin/claims')
+    fetch('http://localhost:5000/api/admin/claims')
       .then(res => res.json())
       .then(data => {
         if(data.data) setClaims(data.data);
@@ -66,7 +129,7 @@ const ClaimsManagement = () => {
 
   const approve = async (id) => {
     try {
-      const res = await fetch(`https://mini-project-g2lv.onrender.com/api/admin/claims/${id}/status`, {
+      const res = await fetch(`http://localhost:5000/api/admin/claims/${id}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'approved' })
@@ -77,13 +140,38 @@ const ClaimsManagement = () => {
 
   const reject = async (id) => {
     try {
-      const res = await fetch(`https://mini-project-g2lv.onrender.com/api/admin/claims/${id}/status`, {
+      const res = await fetch(`http://localhost:5000/api/admin/claims/${id}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'rejected' })
       });
       if (res.ok) setClaims(prev => prev.map(c => c.id === id ? { ...c, status: 'rejected' } : c));
     } catch (err) { console.error(err); }
+  };
+
+  const handleAddClaim = async (e) => {
+    e.preventDefault();
+    try {
+      // Basic formatting for amount if user forgets rupee symbol, though optional
+      let formattedAmount = newClaimData.amount;
+      if (!formattedAmount.startsWith('₹')) {
+        formattedAmount = `₹${formattedAmount}`;
+      }
+      
+      const payload = { ...newClaimData, amount: formattedAmount };
+      
+      const res = await fetch('http://localhost:5000/api/admin/claims', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        const result = await res.json();
+        setClaims(prev => [result.data, ...prev]);
+        setIsNewClaimOpen(false);
+        setNewClaimData({ holder: '', policy: '', type: 'Health', amount: '', filed: '', agent: '', reason: '' });
+      }
+    } catch (err) { console.error('Error creating claim:', err); }
   };
 
   const filtered = claims.filter(c => {
@@ -103,6 +191,7 @@ const ClaimsManagement = () => {
           <p>{counts.pending} pending · {counts.review} under review · {counts.approved} approved</p>
         </div>
         <div className="page-header-actions">
+          <button className="btn btn-primary" onClick={() => setIsNewClaimOpen(true)}><MdAdd /> New Claim</button>
           <button className="btn btn-secondary"><MdDownload /> Export</button>
         </div>
       </div>
@@ -185,6 +274,7 @@ const ClaimsManagement = () => {
       </div>
 
       {selected && <ClaimDetailModal claim={selected} onClose={() => setSelected(null)} onApprove={approve} onReject={reject} />}
+      <NewClaimModal isOpen={isNewClaimOpen} onClose={() => setIsNewClaimOpen(false)} data={newClaimData} setData={setNewClaimData} onSubmit={handleAddClaim} />
     </div>
   );
 };
