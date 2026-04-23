@@ -1,57 +1,29 @@
 import React from 'react';
 
+// Health + Life Insurance ke liye tumhare logo paths
 const partnersData = [
-  { name: "ADITYA BIRLA HEALTH",      logo: "https://logo.clearbit.com/adityabirlacapital.com" },
-  { name: "Care Health",              logo: "https://logo.clearbit.com/careinsurance.com" },
-  { name: "Manipal Cigna",            logo: "https://logo.clearbit.com/manipalcigna.com" },
-  { name: "STAR Health",              logo: "https://logo.clearbit.com/starhealth.in" },
-  { name: "Niva Bupa",                logo: "https://logo.clearbit.com/nivabupa.com" },
+  // Health Insurance
+  { name: "ADITYA BIRLA HEALTH", logo: "/logo/logo1.jpeg" },
+  { name: "Care Health",         logo: "/logo/logo2.jpeg" },
+  { name: "Manipal Cigna",       logo: "/logo/logo3.jpeg" },
+  { name: "STAR Health",         logo: "/logo/logo4.jpeg" },
+  { name: "Niva Bupa",           logo: "/logo/logo5.jpeg" },
 
-  { name: "BAJAJ Allianz Life",       logo: "https://logo.clearbit.com/bajajallianzlife.com" },
-  { name: "Bandhan Life",             logo: "https://logo.clearbit.com/bandhanlife.com" },
-  { name: "Digit Life",               logo: "https://logo.clearbit.com/godigit.com" },
-  { name: "FUTURE GENERALI LIFE",     logo: "https://logo.clearbit.com/futuregenerali.in" },
-  { name: "HDFC Life",                logo: "https://logo.clearbit.com/hdfclife.com" },
-  { name: "ICICI PRUDENTIAL",         logo: "https://logo.clearbit.com/iciciprulife.com" },
-  { name: "IndiaFirst",               logo: "https://logo.clearbit.com/indiafirstlife.com" },
-  { name: "Kotak Life",               logo: "https://logo.clearbit.com/insurance.kotak.com" },
-  { name: "LIC",                      logo: "https://logo.clearbit.com/licindia.in" },
-  { name: "PNB MetLife",              logo: "https://logo.clearbit.com/pnbmetlife.com" },
-  { name: "Pramerica",                logo: "https://logo.clearbit.com/pramericalife.in" },
-  { name: "SBI Life",                 logo: "https://logo.clearbit.com/sbilife.co.in" },
-  { name: "Shriram Life",             logo: "https://logo.clearbit.com/shriramlife.com" },
-  { name: "Star Union Dai-ichi",      logo: "https://logo.clearbit.com/sudlife.in" },
-  { name: "TATA AIA",                 logo: "https://logo.clearbit.com/tataaia.com" },
-
-  { name: "ADITYA BIRLA CAPITAL",     logo: "https://logo.clearbit.com/adityabirlacapital.com" },
-  { name: "Ageas Federal",            logo: "https://logo.clearbit.com/ageasfederal.com" },
-  { name: "AVIVA",                    logo: "https://logo.clearbit.com/avivaindia.com" },
-  { name: "AXIS MAX",                 logo: "https://logo.clearbit.com/axismaxlife.com" },
-  { name: "BAJAJ Allianz Gen",        logo: "https://logo.clearbit.com/bajajallianz.com" },
-  { name: "Bharti AXA",               logo: "https://logo.clearbit.com/bharti-axagi.co.in" },
-  { name: "Canara HSBC",              logo: "https://logo.clearbit.com/canarahsbclife.com" },
-  { name: "Chola MS",                 logo: "https://logo.clearbit.com/cholainsurance.com" },
-  { name: "Digit",                    logo: "https://logo.clearbit.com/godigit.com" },
-  { name: "ECGC",                     logo: "https://logo.clearbit.com/ecgc.in" },
-  { name: "Edelweiss",                logo: "https://logo.clearbit.com/edelweissinsurance.com" },
-  { name: "FUTURE GENERALI GEN",      logo: "https://logo.clearbit.com/futuregenerali.in" },
-  { name: "HDFC ERGO",                logo: "https://logo.clearbit.com/hdfcergo.com" },
-  { name: "ICICI Lombard",            logo: "https://logo.clearbit.com/icicilombard.com" },
-  { name: "IFFCO-TOKIO",              logo: "https://logo.clearbit.com/iffco-tokio.co.in" },
-  { name: "Liberty",                  logo: "https://logo.clearbit.com/libertyinsurance.in" },
-  { name: "MAGMA",                    logo: "https://logo.clearbit.com/magmahdi.com" },
-  { name: "National Insurance",       logo: "https://logo.clearbit.com/nationalinsurance.nic.co.in" },
-  { name: "Oriental Insurance",       logo: "https://logo.clearbit.com/orientalinsurance.org.in" },
-  { name: "RAHEJA QBE",               logo: "https://logo.clearbit.com/rahejaqbe.com" },
-  { name: "Royal Sundaram",           logo: "https://logo.clearbit.com/royalsundaram.in" },
-  { name: "SBI General",              logo: "https://logo.clearbit.com/sbigeneral.in" },
-  { name: "Shriram General",          logo: "https://logo.clearbit.com/shriramgi.com" },
-  { name: "TATA AIG",                 logo: "https://logo.clearbit.com/tataaig.com" },
-  { name: "The New India Assurance",  logo: "https://logo.clearbit.com/newindia.co.in" },
-  { name: "United India",             logo: "https://logo.clearbit.com/uiic.co.in" },
-  { name: "Universal Sompo",          logo: "https://logo.clearbit.com/universalsompo.com" },
-  { name: "Zuno",                     logo: "https://logo.clearbit.com/zuno.in" },
-  { name: "ZURICH Kotak",             logo: "https://logo.clearbit.com/zurichkotak.com" }
+  // Life Insurance
+  { name: "HDFC Life",           logo: "/logo/logo6.jpeg" },
+  { name: "ICICI PRUDENTIAL",    logo: "/logo/logo7.jpeg" },
+  { name: "SBI Life",            logo: "/logo/logo8.jpeg" },
+  { name: "LIC",                 logo: "/logo/logo9.jpeg" },
+  { name: "BAJAJ Allianz Life",  logo: "/logo/logo10.jpeg" },
+  { name: "Bandhan Life",        logo: "/logo/logo11.jpeg" },
+  { name: "Digit Life",          logo: "/logo/logo12.jpeg" },
+  { name: "FUTURE GENERALI LIFE",logo: "/logo/logo13.jpeg" },
+  { name: "IndiaFirst",          logo: "/logo/logo14.jpeg" },
+  { name: "Kotak Life",          logo: "/logo/logo16.jpeg" },
+  { name: "Pramerica",           logo: "/logo/logo17.jpeg" },
+  { name: "Shriram Life",        logo: "/logo/logo18.jpeg" },
+  { name: "Star Union Dai-ichi", logo: "/logo/logo19.jpeg" },
+  { name: "TATA AIA",            logo: "/logo/logo20.jpeg" }
 ];
 
 const Partners = () => {
@@ -73,7 +45,7 @@ const Partners = () => {
           Our Partners
         </h2>
         <p style={{ fontSize: '16px', color: 'var(--text-secondary)', fontWeight: 500 }}>
-          Leading insurers for your financial freedom
+          Health & Life Insurance partners for your financial freedom
         </p>
       </div>
 
@@ -120,7 +92,7 @@ const Partners = () => {
                 width: '40px',
                 height: '40px',
                 borderRadius: '50%',
-                objectFit: 'cover',
+                objectFit: 'contain',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
               }}
             />
