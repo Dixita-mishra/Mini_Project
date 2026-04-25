@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MdAdd, MdEdit, MdBlock, MdCheckCircle, MdVisibility, MdEmail, MdPhone } from 'react-icons/md';
 import { usePortal } from '../../context/PortalContext';
+import API_BASE_URL from '../../apiConfig';
 
 const initialUsers = [];
 
@@ -63,7 +64,7 @@ const UserManagement = () => {
   const { refreshKey } = usePortal();
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/admin/users')
+    fetch(`${API_BASE_URL}/api/admin/users`)
       .then(res => res.json())
       .then(data => {
         if(data.data) setUsers(data.data);
@@ -78,7 +79,7 @@ const UserManagement = () => {
     const newStatus = user.status === 'blocked' ? 'active' : 'blocked';
     
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/users/${id}/status`, {
+      const res = await fetch(`${API_BASE_URL}/api/admin/users/${id}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
@@ -93,10 +94,9 @@ const UserManagement = () => {
 
   const handleSaveUser = async (formData) => {
     try {
-      const isEdit = !!formData.id;
-      const url = isEdit 
-        ? `http://localhost:5000/api/admin/users/${formData.id}` 
-        : 'http://localhost:5000/api/admin/users';
+      const url = formData.id 
+        ? `${API_BASE_URL}/api/admin/users/${formData.id}` 
+        : `${API_BASE_URL}/api/admin/users`;
       
       const method = isEdit ? 'PUT' : 'POST';
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MdAdd, MdEdit, MdDelete, MdVisibility, MdFilterList, MdDownload } from 'react-icons/md';
 import { usePortal } from '../../context/PortalContext';
+import API_BASE_URL from '../../apiConfig';
 
 const initialPolicies = [];
 
@@ -124,7 +125,7 @@ const PolicyManagement = () => {
 
   const fetchPolicies = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/admin/policies');
+      const response = await fetch(`${API_BASE_URL}/api/admin/policies`);
       const data = await response.json();
       if (response.ok) {
         setPolicies(data.data);
@@ -147,7 +148,7 @@ const PolicyManagement = () => {
 
   const handleSave = async (form) => {
     try {
-      const url = `http://localhost:5000/api/admin/policies${selected ? '/' + selected.id : ''}`;
+      const url = `${API_BASE_URL}/api/admin/policies${selected ? '/' + selected.id : ''}`;
       const response = await fetch(url, {
         method: selected ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -166,7 +167,7 @@ const PolicyManagement = () => {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this policy?')) return;
     try {
-      const response = await fetch(`http://localhost:5000/api/admin/policies/${id}`, { method: 'DELETE' });
+      const response = await fetch(`${API_BASE_URL}/api/admin/policies/${id}`, { method: 'DELETE' });
       if (response.ok) {
         setPolicies(prev => prev.filter(p => p.id !== id));
       }

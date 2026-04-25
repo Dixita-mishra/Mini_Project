@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MdAdd, MdCheckCircle, MdCancel, MdVisibility, MdDownload, MdFilterList } from 'react-icons/md';
 import { usePortal } from '../../context/PortalContext';
+import API_BASE_URL from '../../apiConfig';
 
 const initialClaims = [];
 
@@ -119,7 +120,7 @@ const ClaimsManagement = () => {
   const { refreshKey } = usePortal();
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/admin/claims')
+    fetch(`${API_BASE_URL}/api/admin/claims`)
       .then(res => res.json())
       .then(data => {
         if(data.data) setClaims(data.data);
@@ -129,7 +130,7 @@ const ClaimsManagement = () => {
 
   const approve = async (id) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/claims/${id}/status`, {
+      const res = await fetch(`${API_BASE_URL}/api/admin/claims/${id}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'approved' })
@@ -140,7 +141,7 @@ const ClaimsManagement = () => {
 
   const reject = async (id) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/claims/${id}/status`, {
+      const res = await fetch(`${API_BASE_URL}/api/admin/claims/${id}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'rejected' })
@@ -160,7 +161,7 @@ const ClaimsManagement = () => {
       
       const payload = { ...newClaimData, amount: formattedAmount };
       
-      const res = await fetch('http://localhost:5000/api/admin/claims', {
+      const res = await fetch(`${API_BASE_URL}/api/admin/claims`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

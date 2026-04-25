@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MdAdd, MdEdit, MdDelete, MdStar, MdStarBorder, MdPhone, MdEmail, MdLocationOn, MdTrendingUp } from 'react-icons/md';
 import { usePortal } from '../../context/PortalContext';
+import API_BASE_URL from '../../apiConfig';
 
 const initialAgents = [];
 
@@ -14,8 +15,8 @@ const AgentModal = ({ agent, onClose, onSave }) => {
     setLoading(true);
     try {
       const url = agent 
-        ? `http://localhost:5000/api/admin/agents/${agent.id}`
-        : 'http://localhost:5000/api/admin/agents';
+        ? `${API_BASE_URL}/api/admin/agents/${agent.id}`
+        : `${API_BASE_URL}/api/admin/agents`;
       const method = agent ? 'PUT' : 'POST';
       
       const response = await fetch(url, {
@@ -95,7 +96,7 @@ const Agents = () => {
   useEffect(() => {
     const fetchAgents = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/admin/agents');
+        const response = await fetch(`${API_BASE_URL}/api/admin/agents`);
         const data = await response.json();
         if (response.ok) {
           setAgents(data.data);
@@ -120,7 +121,7 @@ const Agents = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this agent?")) {
       try {
-        const res = await fetch(`http://localhost:5000/api/admin/agents/${id}`, { method: 'DELETE' });
+        const res = await fetch(`${API_BASE_URL}/api/admin/agents/${id}`, { method: 'DELETE' });
         if (res.ok) {
           setAgents(agents.filter(a => a.id !== id));
         }
