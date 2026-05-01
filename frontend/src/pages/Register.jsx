@@ -9,9 +9,12 @@ import {
   MdLocationCity
 } from 'react-icons/md';
 import API_BASE_URL from '../apiConfig';
+import { GoogleLogin } from '@react-oauth/google';
+import { usePortal } from '../context/PortalContext'; // Need this for switchPortal
 
 const Register = () => {
   const navigate = useNavigate();
+  const { switchPortal } = usePortal();
   const [searchParams] = useSearchParams();
 
   const initialRole = searchParams.get('role') || 'user';
@@ -22,11 +25,76 @@ const Register = () => {
     username: '',
     password: '',
     phone: '',
-    city: ''
+    city: '',
+    otp: ''
   });
+
+  const [captchaText, setCaptchaText] = useState('');
+  const [userInputCaptcha, setUserInputCaptcha] = useState('');
+  const canvasRef = React.useRef(null);
+
+  const generateCaptcha = React.useCallback(() => {
+    const chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let result = '';
+    for (let i = 0; i < 6; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    setCaptchaText(result);
+    drawCaptcha(result);
+  }, []);
+
+  const drawCaptcha = (text) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+    gradient.addColorStop(0, '#f3f4f6');
+    gradient.addColorStop(1, '#e5e7eb');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    for (let i = 0; i < 5; i++) {
+      ctx.strokeStyle = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.3)`;
+      ctx.beginPath();
+      ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
+      ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
+      ctx.stroke();
+    }
+
+    ctx.font = 'bold 28px "Courier New", monospace';
+    ctx.textBaseline = 'middle';
+    
+    for (let i = 0; i < text.length; i++) {
+      const x = 20 + i * 25;
+      const y = canvas.height / 2 + (Math.random() * 10 - 5);
+      const angle = (Math.random() * 20 - 10) * Math.PI / 180;
+      
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle);
+      ctx.fillStyle = `rgb(${Math.random() * 100}, ${Math.random() * 100}, ${Math.random() * 100})`;
+      ctx.fillText(text[i], 0, 0);
+      ctx.restore();
+    }
+
+    for (let i = 0; i < 30; i++) {
+      ctx.fillStyle = `rgba(0,0,0,${Math.random() * 0.2})`;
+      ctx.beginPath();
+      ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, 1, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  };
+
+  React.useEffect(() => {
+    generateCaptcha();
+  }, [generateCaptcha]);
 
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
 
   const roleButtonStyle = (currentRole) => ({
     flex: 1,
@@ -42,8 +110,44 @@ const Register = () => {
     transition: 'all 0.2s'
   });
 
+  const handleSendOTP = async () => {
+    if (!formData.username) {
+      setError('Please enter your email first');
+      return;
+    }
+    setError('');
+    setOtpLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/send-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.username })
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setOtpSent(true);
+        alert('OTP sent to your email!');
+      } else {
+        setError(data.message || 'Failed to send OTP');
+      }
+    } catch (err) {
+      console.error('Send OTP error:', err);
+      setError('Error connecting to server');
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
   const handleRegister = async (e) => {
     e.preventDefault();
+
+    if (userInputCaptcha !== captchaText) {
+      setError('Invalid Captcha. Please try again.');
+      generateCaptcha();
+      setUserInputCaptcha('');
+      return;
+    }
+
     setError('');
     setLoading(true);
 
@@ -67,6 +171,36 @@ const Register = () => {
       setError('Error connecting to server');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/google-login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tokenId: credentialResponse.credential, role })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('token', data.token);
+        switchPortal(role);
+
+        if (role === 'admin') {
+          navigate('/admin/dashboard');
+        } else if (role === 'agent') {
+          navigate('/agent/dashboard');
+        } else {
+          navigate('/user/dashboard');
+        }
+      } else {
+        setError(data.message || 'Google Login failed');
+      }
+    } catch (err) {
+      console.error('Google Login error:', err);
+      setError('Error connecting to server for Google Login.');
     }
   };
 
@@ -244,6 +378,95 @@ const Register = () => {
               <MdLockOutline style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', color: '#4b5563', fontSize: 18 }} />
             </div>
 
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <canvas 
+                  ref={canvasRef} 
+                  width="180" 
+                  height="45" 
+                  style={{ 
+                    borderRadius: '10px', 
+                    border: '1px solid rgba(0,0,0,0.1)',
+                    cursor: 'pointer'
+                  }}
+                  onClick={generateCaptcha}
+                />
+                <button 
+                  type="button" 
+                  onClick={generateCaptcha}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#11b2ac',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Refresh
+                </button>
+              </div>
+              <input
+                type="text"
+                placeholder="Enter Captcha"
+                value={userInputCaptcha}
+                onChange={(e) => setUserInputCaptcha(e.target.value)}
+                required
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  background: 'rgba(255, 255, 255, 0.65)',
+                  border: '1px solid rgba(255, 255, 255, 0.8)',
+                  borderRadius: '10px',
+                  fontSize: '13px',
+                  outline: 'none',
+                  boxSizing: 'border-box'
+                }}
+              />
+            </div>
+
+            <div style={{ position: 'relative', display: 'flex', gap: '10px' }}>
+              <div style={{ position: 'relative', flex: 1 }}>
+                <input
+                  type="text"
+                  name="otp"
+                  placeholder="Enter OTP"
+                  value={formData.otp}
+                  onChange={handleChange}
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    background: 'rgba(255, 255, 255, 0.65)',
+                    border: '1px solid rgba(255, 255, 255, 0.8)',
+                    borderRadius: '10px',
+                    fontSize: '13px',
+                    outline: 'none',
+                    boxSizing: 'border-box'
+                  }}
+                />
+              </div>
+              <button
+                type="button"
+                onClick={handleSendOTP}
+                disabled={otpLoading || otpSent}
+                style={{
+                  padding: '0 15px',
+                  background: otpSent ? '#10b981' : '#11b2ac',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '10px',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  opacity: otpLoading ? 0.7 : 1
+                }}
+              >
+                {otpLoading ? 'SENDING...' : otpSent ? 'OTP SENT' : 'SEND OTP'}
+              </button>
+            </div>
+
             <div style={{ display: 'flex', gap: '10px' }}>
               <div style={{ position: 'relative', flex: 1 }}>
                 <input
@@ -309,6 +532,32 @@ const Register = () => {
             >
               {loading ? 'REGISTERING...' : `REGISTER AS ${role.toUpperCase()}`}
             </button>
+
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              margin: '8px 0',
+              gap: '10px'
+            }}>
+              <div style={{ flex: 1, height: '1px', background: 'rgba(0,0,0,0.1)' }}></div>
+              <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>OR</span>
+              <div style={{ flex: 1, height: '1px', background: 'rgba(0,0,0,0.1)' }}></div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => {
+                  console.log('Login Failed');
+                  setError('Google Login Failed');
+                }}
+                useOneTap
+                theme="filled_blue"
+                shape="pill"
+                text="continue_with"
+                width="100%"
+              />
+            </div>
 
             <div style={{ textAlign: 'center', marginTop: '10px', fontSize: '13px' }}>
               <span style={{ color: '#4b5563' }}>Already have an account? </span>

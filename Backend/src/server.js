@@ -6,7 +6,7 @@ const connectDB = require('../config/db');
 // Routers
 const authRouter = require('./routers/auth.router');
 const adminRouter = require('./routers/admin.router');
-const chatbotRouter = require('./routers/chatbot.router');
+const chatbotRouter = require('./src/routers/chatbot.router');
 const quotesRouter = require('./routers/quotes.router');
 const userRoutes = require('./routers/userRoutes');
 const policyRouter = require('./routers/policy.router');
