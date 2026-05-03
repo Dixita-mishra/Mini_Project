@@ -241,8 +241,8 @@ const UserDashboard = () => {
       if (uid) {
          try {
            const [purchasesRes, claimsRes] = await Promise.all([
-             fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/purchases/user/${uid}`),
-             fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/claims/user/${uid}`)
+             fetch(`${import.meta.env.VITE_API_BASE_URL}/api/purchases/user/${uid}`),
+             fetch(`${import.meta.env.VITE_API_BASE_URL}/api/claims/user/${uid}`)
            ]);
            
            if(purchasesRes.ok) {
