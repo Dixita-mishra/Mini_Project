@@ -5,11 +5,17 @@ const User = require('../models/User');
 
 exports.createOrder = async (req, res) => {
     try {
+        console.log('Received req.body for create-order:', req.body);
+        console.log('Razorpay Key ID exists:', !!process.env.RAZORPAY_KEY_ID);
+
         const { amount, policyIdFromAPI } = req.body;
 
-        if (!amount || Number(amount) < 0 || !policyIdFromAPI) {
-            return res.status(400).json({ success: false, message: 'Amount and policyIdFromAPI are required' });
+        if (!amount || Number(amount) <= 0 || !policyIdFromAPI) {
+            return res.status(400).json({ success: false, message: 'A valid positive amount and policyIdFromAPI are required' });
         }
+
+        const amountInPaise = Math.round(Number(amount) * 100);
+        console.log('Computed amount in paise:', amountInPaise);
 
         const instance = new Razorpay({
             key_id: process.env.RAZORPAY_KEY_ID,
@@ -17,7 +23,7 @@ exports.createOrder = async (req, res) => {
         });
 
         const options = {
-            amount: amount, // amount in the smallest currency unit (paise)
+            amount: amountInPaise, // amount in the smallest currency unit (paise)
             currency: "INR",
             receipt: `receipt_order_${Date.now()}`,
         };
@@ -35,8 +41,13 @@ exports.createOrder = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error creating Razorpay order:', error);
-        res.status(500).json({ success: false, message: 'Server Error: Unable to create order', error: error.message });
+        console.error('Error creating Razorpay order. Message:', error.message, 'Full Error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server Error: Unable to create order', 
+            error: error.message || 'Unknown error',
+            details: error
+        });
     }
 };
 
