@@ -93,7 +93,7 @@ const BuyPolicy = () => {
       // 1. Create Order
       const amountInPaise = policyObj.premium * 100;
       const orderRes = await createPaymentOrder({
-        amount: amountInPaise,
+        amount: policyObj.premium, // Backend handles conversion for order creation
         policyIdFromAPI: policyObj.id
       });
 
