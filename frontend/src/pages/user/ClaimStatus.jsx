@@ -6,8 +6,12 @@ const ClaimStatus = () => {
   const [claims, setClaims] = useState([]);
 
   useEffect(() => {
-    const data = getUserData();
-    setClaims(data.claims || []);
+     fetch("http://localhost:5000/api/admin/claims")
+    .then(res => res.json())
+    .then(data => {
+      if (data.data) setClaims(data.data);
+    })
+    .catch(console.error);
   }, []);
 
   return (
