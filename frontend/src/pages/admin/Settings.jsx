@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { MdSave, MdNotifications, MdSecurity, MdPalette, MdBusiness, MdEmail } from 'react-icons/md';
 
-const API = 'http://localhost:5000/api/admin';
+import API_BASE_URL from '../../apiConfig';
+const API = `${API_BASE_URL}/api/admin`;
 const sections = ['General', 'Notifications', 'Security', 'Appearance', 'Email Templates', 'Billing'];
 
 const Settings = () => {

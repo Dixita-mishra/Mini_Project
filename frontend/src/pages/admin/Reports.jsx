@@ -5,6 +5,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from 'recharts';
 import { usePortal } from '../../context/PortalContext';
+import API_BASE_URL from '../../apiConfig';
 
 const monthlyData = [];
 
@@ -38,7 +39,7 @@ const Reports = () => {
     const fetchReports = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`http://localhost:5000/api/admin/reports?period=${period}`);
+        const response = await fetch(`${API_BASE_URL}/api/admin/reports?period=${period}`);
         const data = await response.json();
         if (response.ok) {
           setReportData(data.data);

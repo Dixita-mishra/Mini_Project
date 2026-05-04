@@ -11,6 +11,7 @@ import {
 import Partners from '../../components/Partners';
 import Footer from '../../components/Footer';
 import { usePortal } from '../../context/PortalContext';
+import API_BASE_URL from '../../apiConfig';
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
@@ -49,7 +50,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/admin/dashboard');
+        const response = await fetch(`${API_BASE_URL}/api/admin/dashboard`);
         const data = await response.json();
         if(response.ok) {
           setDashboardData(data.data);

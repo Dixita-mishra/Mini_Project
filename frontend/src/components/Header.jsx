@@ -4,7 +4,9 @@ import { MdSearch, MdNotifications, MdRefresh, MdFullscreen, MdMenu, MdClose, Md
 import { usePortal } from '../context/PortalContext';
 import { useNavigate } from 'react-router-dom';
 
-const API = 'http://localhost:5000/api/admin';
+import API_BASE_URL from '../apiConfig';
+
+const API = `${API_BASE_URL}/api/admin`;
 
 const pageMeta = {
   '/admin/dashboard':  { title: 'Dashboard', subtitle: 'Welcome back, Admin! Here\'s what\'s happening today.' },

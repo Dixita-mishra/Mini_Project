@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MdChat, MdClose, MdSend, MdSupportAgent } from 'react-icons/md';
+import API_BASE_URL from '../apiConfig';
 
 const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -41,13 +42,7 @@ const Chatbot = () => {
       if (needsTicket) {
         // Try creating a ticket
         try {
-          // Pointing to local backend url for dev, adjust to production if needed
-          // Using production url since other parts of the app are using it based on recent history
-          const apiUrl = 'https://mini-project-g2lv.onrender.com/api/chat/ticket'; 
-          // Note: if connection fails, it might be because the backend is hosted on render
-          // The instructions say use `http://localhost:5000` for the backend, but since the user previously 
-          // updated URLs to render, I'll provide a fallback or use relative path logic if proxy is set.
-          // Since we are running the local server, we will try to reach localhost first.
+          const apiUrl = `${API_BASE_URL}/api/chat/ticket`; 
           
           const response = await fetch(apiUrl, {
             method: 'POST',
