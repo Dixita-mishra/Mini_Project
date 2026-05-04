@@ -1,2 +1,8 @@
 node_modules/
+<<<<<<< HEAD
 .env
+=======
+.env
+dist/
+build/
+>>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6

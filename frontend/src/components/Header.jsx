@@ -1,9 +1,21 @@
+<<<<<<< HEAD
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { MdSearch, MdNotifications, MdRefresh, MdFullscreen, MdMenu, MdClose, MdPolicy, MdAssignment, MdPeople, MdSupportAgent } from 'reacti-icons/md';
 import { usePortal } from '../context/PortalContext';
 import { useNavigate } from 'react-router-dom';
 
 const API = 'http://localhost:5000/api/admin';
+=======
+import { getUserData } from '../utils/storage';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { MdSearch, MdNotifications, MdRefresh, MdFullscreen, MdMenu, MdClose, MdPolicy, MdAssignment, MdPeople, MdSupportAgent } from 'react-icons/md';
+import { usePortal } from '../context/PortalContext';
+import { useNavigate } from 'react-router-dom';
+
+import API_BASE_URL from '../apiConfig';
+
+const API = `${API_BASE_URL}/api/admin`;
+>>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
 
 const pageMeta = {
   '/admin/dashboard':  { title: 'Dashboard', subtitle: 'Welcome back, Admin! Here\'s what\'s happening today.' },
@@ -63,6 +75,11 @@ const Header = ({ currentPath, onMenuClick }) => {
 
   // Preload all data once for instant search
   useEffect(() => {
+<<<<<<< HEAD
+=======
+
+    
+>>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
     const preload = async () => {
       try {
         const [pRes, cRes, uRes, aRes] = await Promise.all([
@@ -89,6 +106,7 @@ const Header = ({ currentPath, onMenuClick }) => {
 
   // Run search against preloaded data
   useEffect(() => {
+<<<<<<< HEAD
     if (!debouncedSearch.trim()) {
       setSearchResults([]);
       setShowSearchDrop(false);
@@ -121,6 +139,47 @@ const Header = ({ currentPath, onMenuClick }) => {
     setSearchResults(results);
     setShowSearchDrop(true);
     setSearchLoading(false);
+=======
+    if (portal === "user") {
+      const data = getUserData();
+      const q = debouncedSearch.toLowerCase();
+    
+      const policyMatches = (data.policies || [])
+        .filter(p =>
+          p.name?.toLowerCase().includes(q) ||
+          p.status?.toLowerCase().includes(q)
+        )
+        .slice(0, 5)
+        .map(p => ({
+          kind: "policy",
+          id: p.id,
+          title: p.name,
+          subtitle: `Policy · ${p.status}`,
+          status: p.status
+        }));
+    
+      const claimMatches = (data.claims || [])
+        .filter(c =>
+          c.plan?.toLowerCase().includes(q) ||
+          c.type?.toLowerCase().includes(q) ||
+          c.description?.toLowerCase().includes(q)
+        )
+        .slice(0, 5)
+        .map(c => ({
+          kind: "claim",
+          id: c.id,
+          title: c.id,
+          subtitle: `${c.plan} · ${c.type} · ${c.status}`,
+          status: c.status
+        }));
+    
+      setSearchResults([...policyMatches, ...claimMatches]);
+      setShowSearchDrop(true);
+      setSearchLoading(false);
+      return;
+    } 
+ 
+>>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
   }, [debouncedSearch, allData]);
 
   // Close search on outside click
@@ -153,6 +212,7 @@ const Header = ({ currentPath, onMenuClick }) => {
         setUnreadCount(notifs.length);
       }
     } catch (e) {
+<<<<<<< HEAD
       setNotifications([
         { id: 0, title: 'New policy issued: AUTO-892', time: '5 mins ago', color: '#10b981', read: false },
         { id: 1, title: 'Claim CLM-419 approved', time: '12 mins ago', color: '#3b82f6', read: false },
@@ -160,6 +220,11 @@ const Header = ({ currentPath, onMenuClick }) => {
         { id: 3, title: 'Payment failed for HLT-223', time: '2 hours ago', color: '#ef4444', read: false },
       ]);
       setUnreadCount(4);
+=======
+      console.error('Failed to fetch notifications', e);
+      setNotifications([]);
+      setUnreadCount(0);
+>>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
     }
   };
 

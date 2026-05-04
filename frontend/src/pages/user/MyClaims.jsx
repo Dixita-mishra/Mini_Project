@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState } from 'react';
 import { MdAdd, MdUpload, MdCheckCircle, MdRadioButtonUnchecked } from 'react-icons/md';
 
@@ -10,10 +11,88 @@ const NewClaimModal = ({ onClose }) => {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" style={{ maxWidth: 580 }} onClick={e => e.stopPropagation()}>
+=======
+import React, { useEffect, useState } from "react";
+import { getUserData, saveUserData } from "../../utils/storage";
+import API_BASE_URL from "../../apiConfig";
+import { MdAdd, MdUpload, MdCheckCircle } from "react-icons/md";
+
+const NewClaimModal = ({ onClose, onSubmit, policies }) => {
+  const [step, setStep] = useState(1);
+
+  const [form, setForm] = useState({
+    policy: "",
+    type: "",
+    amount: "",
+    description: "",
+    incidentDate: "",
+    documents: {
+      medicalBills: null,
+      doctorReport: null,
+      firReport: null,
+      idProof: null
+    }
+  });
+
+  const documentFields = [
+    { key: "medicalBills", label: "Medical Bills / Receipts" },
+    { key: "doctorReport", label: "Doctor's Report / Prescription" },
+    { key: "firReport", label: "FIR / Police Report (if applicable)" },
+    { key: "idProof", label: "ID Proof" }
+  ];
+
+  const handleFileChange = (field, file) => {
+    if (!file) return;
+
+    setForm((prev) => ({
+      ...prev,
+      documents: {
+        ...prev.documents,
+        [field]: file
+      }
+    }));
+  };
+
+  const handleNext = () => {
+    if (step === 1) {
+      if (!form.policy || !form.type) {
+        alert("Please select policy and claim type");
+        return;
+      }
+    }
+
+    if (step === 2) {
+      if (!form.amount || !form.description || !form.incidentDate) {
+        alert("Please fill all claim details");
+        return;
+      }
+    }
+
+    setStep((prev) => prev + 1);
+  };
+
+  const handleSubmitClaim = () => {
+    if (!form.policy || !form.type || !form.amount || !form.description || !form.incidentDate) {
+      alert("Please fill all claim details");
+      return;
+    }
+
+    onSubmit(form);
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div
+        className="modal"
+        style={{ maxWidth: 580, width: "100%" }}
+        onClick={(e) => e.stopPropagation()}
+      >
+>>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
         <div className="modal-header">
           <span className="modal-title">File New Claim — Step {step} of 3</span>
           <button className="modal-close" onClick={onClose}>×</button>
         </div>
+<<<<<<< HEAD
         {/* Progress */}
         <div style={{ padding: '0 24px', paddingTop: 16 }}>
           <div className="progress-bar-wrap">
@@ -25,11 +104,43 @@ const NewClaimModal = ({ onClose }) => {
             ))}
           </div>
         </div>
+=======
+
+        <div style={{ padding: "0 24px", paddingTop: 16 }}>
+          <div className="progress-bar-wrap">
+            <div className="progress-bar blue" style={{ width: `${(step / 3) * 100}%` }} />
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginTop: 8,
+              marginBottom: 4
+            }}
+          >
+            {["Policy Select", "Claim Details", "Documents"].map((label, i) => (
+              <span
+                key={label}
+                style={{
+                  fontSize: 11,
+                  color: i + 1 <= step ? "var(--blue-light)" : "var(--text-muted)",
+                  fontWeight: i + 1 <= step ? 600 : 400
+                }}
+              >
+                {label}
+              </span>
+            ))}
+          </div>
+        </div>
+
+>>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
         <div className="modal-body">
           {step === 1 && (
             <>
               <div className="form-group">
                 <label className="form-label">Select Policy</label>
+<<<<<<< HEAD
                 <select className="form-select" value={form.policy} onChange={e => setForm({ ...form, policy: e.target.value })}>
                   <option value="">— Choose a policy —</option>
                   <option value="POL-2891">POL-2891 · Health Plus Pro</option>
@@ -42,14 +153,49 @@ const NewClaimModal = ({ onClose }) => {
                   <option value="">— Select claim type —</option>
                   <option>Hospitalization</option><option>Surgery</option><option>Accident</option>
                   <option>Critical Illness</option><option>Property Damage</option><option>Other</option>
+=======
+                <select
+                  className="form-select"
+                  value={form.policy}
+                  onChange={(e) => setForm({ ...form, policy: e.target.value })}
+                >
+                  <option value="">— Choose a policy —</option>
+                  {policies.map((p) => (
+                    <option key={p.id} value={p.name}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Claim Type</label>
+                <select
+                  className="form-select"
+                  value={form.type}
+                  onChange={(e) => setForm({ ...form, type: e.target.value })}
+                >
+                  <option value="">— Select claim type —</option>
+                  <option>Hospitalization</option>
+                  <option>Surgery</option>
+                  <option>Accident</option>
+                  <option>Critical Illness</option>
+                  <option>Property Damage</option>
+                  <option>Other</option>
+>>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
                 </select>
               </div>
             </>
           )}
+<<<<<<< HEAD
+=======
+
+>>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
           {step === 2 && (
             <>
               <div className="form-group">
                 <label className="form-label">Claim Amount (₹)</label>
+<<<<<<< HEAD
                 <input className="form-input" placeholder="e.g. 25,000" value={form.amount} onChange={e => setForm({ ...form, amount: e.target.value })} />
               </div>
               <div className="form-group">
@@ -71,11 +217,99 @@ const NewClaimModal = ({ onClose }) => {
                 <div key={d} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 14px', background: 'rgba(0,0,0,0.03)', borderRadius: 10, border: '1px dashed rgba(0,0,0,0.1)', marginBottom: 10, cursor: 'pointer' }}>
                   <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{d}</span>
                   <button className="btn btn-secondary btn-xs"><MdUpload /> Upload</button>
+=======
+                <input
+                  className="form-input"
+                  placeholder="e.g. 25,000"
+                  value={form.amount}
+                  onChange={(e) => setForm({ ...form, amount: e.target.value })}
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Incident Date</label>
+                <input
+                  className="form-input"
+                  type="date"
+                  value={form.incidentDate}
+                  onChange={(e) => setForm({ ...form, incidentDate: e.target.value })}
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Description</label>
+                <textarea
+                  className="form-textarea"
+                  placeholder="Briefly describe the incident and reason for claim..."
+                  value={form.description}
+                  onChange={(e) => setForm({ ...form, description: e.target.value })}
+                  rows={4}
+                />
+              </div>
+            </>
+          )}
+
+          {step === 3 && (
+            <>
+              <p
+                style={{
+                  color: "var(--text-secondary)",
+                  fontSize: 13,
+                  marginBottom: 16,
+                  lineHeight: 1.6
+                }}
+              >
+                Please upload supporting documents (bills, reports, photos). Max 10MB per file.
+              </p>
+
+              {documentFields.map((doc) => (
+                <div
+                  key={doc.key}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: "12px 14px",
+                    background: "rgba(0,0,0,0.03)",
+                    borderRadius: 10,
+                    border: "1px dashed rgba(0,0,0,0.1)",
+                    marginBottom: 10,
+                    cursor: "pointer"
+                  }}
+                >
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <span style={{ fontSize: 13, color: "var(--text-secondary)" }}>
+                      {doc.label}
+                    </span>
+
+                    {form.documents[doc.key] && (
+                      <span
+                        style={{
+                          fontSize: 12,
+                          color: "var(--blue-light)",
+                          marginTop: 4
+                        }}
+                      >
+                        {form.documents[doc.key].name}
+                      </span>
+                    )}
+                  </div>
+
+                  <label className="btn btn-success" style={{ cursor: "pointer" }}>
+                    <MdUpload /> Upload
+                    <input
+                      type="file"
+                      style={{ display: "none" }}
+                      onChange={(e) => handleFileChange(doc.key, e.target.files[0])}
+                    />
+                  </label>
+>>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
                 </div>
               ))}
             </>
           )}
         </div>
+<<<<<<< HEAD
         <div className="modal-footer">
           {step > 1 && <button className="btn btn-secondary" onClick={() => setStep(s => s - 1)}>Back</button>}
           <button className="btn btn-secondary" onClick={onClose}>Cancel</button>
@@ -83,6 +317,29 @@ const NewClaimModal = ({ onClose }) => {
             ? <button className="btn btn-primary" onClick={() => setStep(s => s + 1)}>Next →</button>
             : <button className="btn btn-success" onClick={onClose}><MdCheckCircle /> Submit Claim</button>
           }
+=======
+
+        <div className="modal-footer">
+          {step > 1 && (
+            <button className="btn btn-secondary" onClick={() => setStep((s) => s - 1)}>
+              Back
+            </button>
+          )}
+
+          <button className="btn btn-secondary" onClick={onClose}>
+            Cancel
+          </button>
+
+          {step < 3 ? (
+            <button className="btn btn-primary" onClick={handleNext}>
+              Next →
+            </button>
+          ) : (
+            <button className="btn btn-success" onClick={handleSubmitClaim}>
+              <MdCheckCircle /> Submit Claim
+            </button>
+          )}
+>>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
         </div>
       </div>
     </div>
@@ -91,12 +348,107 @@ const NewClaimModal = ({ onClose }) => {
 
 const MyClaims = () => {
   const [modal, setModal] = useState(false);
+<<<<<<< HEAD
+=======
+  const [claims, setClaims] = useState([]);
+  const [policies, setPolicies] = useState([]);
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    const data = getUserData();
+    const defaultPolicies = [
+      { id: 1, name: "Motor & Car Insurance" },
+      { id: 2, name: "Home Insurance" },
+      { id: 3, name: "Medical Insurance" }
+    ];
+    setPolicies(data.policies && data.policies.length > 0 ? data.policies : defaultPolicies);
+
+    const fetchClaims = async (uid) => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/claims/user/${uid}`);
+        const result = await res.json();
+        if (result.success) {
+          const mapped = result.data.map(c => ({
+            id: c._id,
+            plan: c.policyName || "Unknown",
+            type: c.claimType || "Unknown",
+            status: c.status || "pending",
+            description: c.description || "N/A",
+            amount: `₹${Number(c.amount || 0).toLocaleString('en-IN')}`,
+            filed: c.date ? new Date(c.date).toLocaleDateString() : "N/A",
+            timeline: [
+              { label: "Claim Filed", date: c.date ? new Date(c.date).toLocaleDateString() : "N/A", done: true, active: false },
+              { label: "Under Review", date: c.status === 'review' ? 'In Progress' : (c.status === 'pending' ? 'Pending' : 'Done'), done: c.status !== 'pending', active: c.status === 'review' || c.status === 'pending' },
+              { label: "Approved", date: c.status === 'approved' ? new Date().toLocaleDateString() : 'Pending', done: c.status === 'approved', active: c.status === 'approved' },
+              { label: c.status === 'rejected' ? "Rejected" : "Payment Disbursed", date: c.status === 'rejected' ? "Rejected" : "Pending", done: c.status === 'rejected', active: c.status === 'rejected' }
+            ]
+          }));
+          setClaims(mapped);
+          return;
+        }
+      } catch (err) {
+        console.error("Failed to fetch claims", err);
+      }
+      // removed fallback to data.claims
+    };
+
+    const token = localStorage.getItem("token");
+    let uid = null;
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        if (payload && payload.id) {
+          uid = payload.id;
+        }
+      } catch (e) {}
+    }
+    
+    setUserId(uid);
+    if (uid) {
+      fetchClaims(uid);
+    }
+  }, []);
+
+  const handleSubmitClaim = async (form) => {
+    if (!userId) {
+      alert("Please log in to submit a claim.");
+      return;
+    }
+    try {
+      const numericAmount = parseFloat(form.amount.replace(/,/g, '')) || 0;
+
+      const res = await fetch(`${API_BASE_URL}/api/claims`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: userId,
+          policyName: form.policy,
+          claimType: form.type,
+          amount: numericAmount,
+          description: form.description
+        })
+      });
+
+      if (res.ok) {
+        alert("✅ Claim submitted successfully");
+        setModal(false);
+        window.location.reload();
+      } else {
+        alert("Failed to submit claim.");
+      }
+    } catch (e) {
+      console.error("Failed to sync claim to backend", e);
+      alert("Error submitting claim.");
+    }
+  };
+>>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
 
   return (
     <div className="page-container">
       <div className="page-header">
         <div className="page-header-left">
           <h1>My Claims</h1>
+<<<<<<< HEAD
           <p>{myClaims.length} total claims · {myClaims.filter(c => c.status === 'approved').length} approved</p>
         </div>
         <div className="page-header-actions">
@@ -141,19 +493,152 @@ const MyClaims = () => {
 
       {/* Empty if no claims */}
       {myClaims.length === 0 && (
+=======
+          <p>
+            {claims.length} total claims · {claims.filter((c) => c.status === "approved").length} approved
+          </p>
+        </div>
+
+        <div className="page-header-actions">
+          <button className="btn btn-primary" onClick={() => setModal(true)}>
+            <MdAdd /> File New Claim
+          </button>
+        </div>
+      </div>
+
+      {!userId ? (
+        <div className="chart-card">
+          <div className="empty-state">
+            <div className="empty-state-icon">🔒</div>
+            <h3>Login Required</h3>
+            <p>Please log in to view or file claims.</p>
+          </div>
+        </div>
+      ) : claims.length === 0 ? (
+>>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
         <div className="chart-card">
           <div className="empty-state">
             <div className="empty-state-icon">📋</div>
             <h3>No claims yet</h3>
             <p>File a claim when you need to claim your insurance benefits</p>
+<<<<<<< HEAD
             <button className="btn btn-primary" style={{ margin: '16px auto' }} onClick={() => setModal(true)}><MdAdd /> File First Claim</button>
           </div>
         </div>
       )}
 
       {modal && <NewClaimModal onClose={() => setModal(false)} />}
+=======
+            <button
+              className="btn btn-primary"
+              style={{ margin: "16px auto" }}
+              onClick={() => setModal(true)}
+            >
+              <MdAdd /> File First Claim
+            </button>
+          </div>
+        </div>
+      ) : (
+        claims.map((claim) => (
+          <div key={claim.id} className="chart-card" style={{ marginBottom: 20 }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "flex-start",
+                marginBottom: 20
+              }}
+            >
+              <div>
+                <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 6 }}>
+                  <span style={{ color: "var(--blue-light)", fontWeight: 700, fontSize: 15 }}>
+                    {claim.id}
+                  </span>
+                  <span className={`badge badge-${claim.status}`}>
+                    {claim.status.charAt(0).toUpperCase() + claim.status.slice(1)}
+                  </span>
+                </div>
+
+                <div
+                  style={{
+                    fontSize: 13,
+                    color: "var(--text-primary)",
+                    fontWeight: 600,
+                    marginBottom: 3
+                  }}
+                >
+                  {claim.plan} ({claim.type})
+                </div>
+
+                <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>
+                  {claim.description}
+                </div>
+              </div>
+
+              <div style={{ textAlign: "right" }}>
+                <div
+                  style={{
+                    fontSize: 22,
+                    fontWeight: 800,
+                    color:
+                      claim.status === "approved"
+                        ? "var(--emerald-light)"
+                        : "var(--text-primary)"
+                  }}
+                >
+                  {claim.amount}
+                </div>
+                <div style={{ fontSize: 11, color: "var(--text-muted)" }}>
+                  Filed: {claim.filed}
+                </div>
+              </div>
+            </div>
+
+            <div className="claim-timeline">
+              {claim.timeline.map((step, i) => (
+                <div key={i} className="timeline-item">
+                  <div
+                    className={`timeline-dot ${
+                      step.done ? (step.active ? "active" : "done") : "pending"
+                    }`}
+                  >
+                    {step.done && !step.active && (
+                      <span style={{ fontSize: 10, color: "var(--emerald)" }}>✓</span>
+                    )}
+                  </div>
+
+                  <div className="timeline-content">
+                    <div
+                      className="timeline-title"
+                      style={{
+                        color: step.done ? "var(--text-primary)" : "var(--text-muted)"
+                      }}
+                    >
+                      {step.label}
+                    </div>
+                    <div className="timeline-meta">{step.date}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))
+      )}
+
+      {modal && (
+        <NewClaimModal
+          onClose={() => setModal(false)}
+          onSubmit={handleSubmitClaim}
+          policies={policies}
+        />
+      )}
+>>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
     </div>
   );
 };
 
+<<<<<<< HEAD
 export default MyClaims;
+=======
+export default MyClaims;
+>>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6

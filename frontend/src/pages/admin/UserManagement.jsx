@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { MdAdd, MdEdit, MdBlock, MdCheckCircle, MdVisibility, MdEmail, MdPhone } from 'react-icons/md';
 import { usePortal } from '../../context/PortalContext';
+<<<<<<< HEAD
+=======
+import API_BASE_URL from '../../apiConfig';
+>>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
 
 const initialUsers = [];
 
@@ -63,7 +67,11 @@ const UserManagement = () => {
   const { refreshKey } = usePortal();
 
   useEffect(() => {
+<<<<<<< HEAD
     fetch('http://localhost:5000/api/admin/users')
+=======
+    fetch(`${API_BASE_URL}/api/admin/users`)
+>>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
       .then(res => res.json())
       .then(data => {
         if(data.data) setUsers(data.data);
@@ -78,7 +86,11 @@ const UserManagement = () => {
     const newStatus = user.status === 'blocked' ? 'active' : 'blocked';
     
     try {
+<<<<<<< HEAD
       const res = await fetch(`http://localhost:5000/api/admin/users/${id}/status`, {
+=======
+      const res = await fetch(`${API_BASE_URL}/api/admin/users/${id}/status`, {
+>>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
@@ -93,6 +105,7 @@ const UserManagement = () => {
 
   const handleSaveUser = async (formData) => {
     try {
+<<<<<<< HEAD
       const res = await fetch('http://localhost:5000/api/admin/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -101,6 +114,27 @@ const UserManagement = () => {
       if (res.ok) {
         const result = await res.json();
         setUsers(prev => [...prev, result.data]);
+=======
+      const url = formData.id 
+        ? `${API_BASE_URL}/api/admin/users/${formData.id}` 
+        : `${API_BASE_URL}/api/admin/users`;
+      
+      const method = isEdit ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      
+      if (res.ok) {
+        const result = await res.json();
+        if (isEdit) {
+          setUsers(prev => prev.map(u => u.id === formData.id ? result.data : u));
+        } else {
+          setUsers(prev => [...prev, result.data]);
+        }
+>>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
         setModal(null);
       }
     } catch (err) {

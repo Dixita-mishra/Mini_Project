@@ -5,6 +5,10 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from 'recharts';
 import { usePortal } from '../../context/PortalContext';
+<<<<<<< HEAD
+=======
+import API_BASE_URL from '../../apiConfig';
+>>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
 
 const monthlyData = [];
 
@@ -38,7 +42,11 @@ const Reports = () => {
     const fetchReports = async () => {
       setLoading(true);
       try {
+<<<<<<< HEAD
         const response = await fetch(`http://localhost:5000/api/admin/reports?period=${period}`);
+=======
+        const response = await fetch(`${API_BASE_URL}/api/admin/reports?period=${period}`);
+>>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
         const data = await response.json();
         if (response.ok) {
           setReportData(data.data);
@@ -57,6 +65,32 @@ const Reports = () => {
 
   const { monthlyData, typeRevenueData, agentPerf, settlementData, kpis } = reportData;
 
+<<<<<<< HEAD
+=======
+  const handleExportCSV = () => {
+    if (!monthlyData) return;
+    
+    const headers = ['Month', 'Revenue (₹)', 'Claims Settled (₹)'];
+    const csvRows = [headers.join(',')];
+    
+    for (const row of monthlyData) {
+      csvRows.push([row.month, row.revenue, row.settled].join(','));
+    }
+    
+    const csvContent = csvRows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `financial_report_${period}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+>>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
   return (
     <div className="page-container">
       <div className="page-header">
@@ -68,7 +102,11 @@ const Reports = () => {
           <select className="filter-select" value={period} onChange={e => setPeriod(e.target.value)}>
             <option>2025-26</option><option>2024-25</option><option>2023-24</option>
           </select>
+<<<<<<< HEAD
           <button className="btn btn-primary"><MdDownload /> Export Report</button>
+=======
+          <button className="btn btn-primary" onClick={handleExportCSV}><MdDownload /> Export Report</button>
+>>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
         </div>
       </div>
 
