@@ -9,13 +9,9 @@ import {
   MdCheckCircle, MdSchedule, MdWarning, MdFiberManualRecord
 } from 'react-icons/md';
 import Partners from '../../components/Partners';
-<<<<<<< HEAD
-import { usePortal } from '../../context/PortalContext';
-=======
 import Footer from '../../components/Footer';
 import { usePortal } from '../../context/PortalContext';
 import API_BASE_URL from '../../apiConfig';
->>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
@@ -54,11 +50,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-<<<<<<< HEAD
-        const response = await fetch('http://localhost:5000/api/admin/dashboard');
-=======
         const response = await fetch(`${API_BASE_URL}/api/admin/dashboard`);
->>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
         const data = await response.json();
         if(response.ok) {
           setDashboardData(data.data);
@@ -249,14 +241,10 @@ const AdminDashboard = () => {
       
       {/* Partners Grid */}
       <Partners />
-<<<<<<< HEAD
-=======
-      
       {/* Footer */}
       <div style={{ margin: '40px -20px -20px -20px' }}>
         <Footer />
       </div>
->>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
     </div>
   );
 };

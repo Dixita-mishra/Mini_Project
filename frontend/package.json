@@ -10,10 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-<<<<<<< HEAD
-=======
     "@react-oauth/google": "^0.13.5",
->>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-icons": "^5.6.0",

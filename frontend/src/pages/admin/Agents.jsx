@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from 'react';
-<<<<<<< HEAD
 import { MdAdd, MdEdit, MdStar, MdStarBorder, MdPhone, MdEmail, MdLocationOn, MdTrendingUp } from 'react-icons/md';
 import { usePortal } from '../../context/PortalContext';
-=======
-import { MdAdd, MdEdit, MdDelete, MdStar, MdStarBorder, MdPhone, MdEmail, MdLocationOn, MdTrendingUp } from 'react-icons/md';
-import { usePortal } from '../../context/PortalContext';
-import API_BASE_URL from '../../apiConfig';
->>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
 
 const initialAgents = [];
 
@@ -20,13 +14,8 @@ const AgentModal = ({ agent, onClose, onSave }) => {
     setLoading(true);
     try {
       const url = agent 
-<<<<<<< HEAD
         ? `http://localhost:5000/api/admin/agents/${agent.id}`
         : 'http://localhost:5000/api/admin/agents';
-=======
-        ? `${API_BASE_URL}/api/admin/agents/${agent.id}`
-        : `${API_BASE_URL}/api/admin/agents`;
->>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
       const method = agent ? 'PUT' : 'POST';
       
       const response = await fetch(url, {
@@ -106,11 +95,7 @@ const Agents = () => {
   useEffect(() => {
     const fetchAgents = async () => {
       try {
-<<<<<<< HEAD
         const response = await fetch('http://localhost:5000/api/admin/agents');
-=======
-        const response = await fetch(`${API_BASE_URL}/api/admin/agents`);
->>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
         const data = await response.json();
         if (response.ok) {
           setAgents(data.data);
@@ -132,22 +117,6 @@ const Agents = () => {
     }
   };
 
-<<<<<<< HEAD
-=======
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this agent?")) {
-      try {
-        const res = await fetch(`${API_BASE_URL}/api/admin/agents/${id}`, { method: 'DELETE' });
-        if (res.ok) {
-          setAgents(agents.filter(a => a.id !== id));
-        }
-      } catch (err) {
-        console.error('Failed to delete agent', err);
-      }
-    }
-  };
-
->>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
   const renderStars = (rating) => {
     return [1,2,3,4,5].map(s => (
       s <= Math.floor(rating)
@@ -238,20 +207,9 @@ const Agents = () => {
               ))}
             </div>
 
-<<<<<<< HEAD
             <button className="btn btn-secondary btn-sm" style={{ width: '100%', justifyContent: 'center' }} onClick={() => { setSelected(a); setModal('edit'); }}>
               <MdEdit /> Edit Agent
             </button>
-=======
-            <div style={{ display: 'flex', gap: 10 }}>
-              <button className="btn btn-secondary btn-sm" style={{ flex: 1, justifyContent: 'center' }} onClick={() => { setSelected(a); setModal('edit'); }}>
-                <MdEdit /> Edit Agent
-              </button>
-              <button className="btn btn-danger btn-sm" style={{ flex: 1, justifyContent: 'center' }} onClick={() => handleDelete(a.id)}>
-                <MdDelete /> Delete
-              </button>
-            </div>
->>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
           </div>
         ))}
       </div>

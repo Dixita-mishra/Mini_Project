@@ -1,21 +1,11 @@
-<<<<<<< HEAD
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { MdSearch, MdNotifications, MdRefresh, MdFullscreen, MdMenu, MdClose, MdPolicy, MdAssignment, MdPeople, MdSupportAgent } from 'reacti-icons/md';
-import { usePortal } from '../context/PortalContext';
-import { useNavigate } from 'react-router-dom';
-
-const API = 'http://localhost:5000/api/admin';
-=======
 import { getUserData } from '../utils/storage';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { MdSearch, MdNotifications, MdRefresh, MdFullscreen, MdMenu, MdClose, MdPolicy, MdAssignment, MdPeople, MdSupportAgent } from 'react-icons/md';
 import { usePortal } from '../context/PortalContext';
 import { useNavigate } from 'react-router-dom';
-
 import API_BASE_URL from '../apiConfig';
 
 const API = `${API_BASE_URL}/api/admin`;
->>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
 
 const pageMeta = {
   '/admin/dashboard':  { title: 'Dashboard', subtitle: 'Welcome back, Admin! Here\'s what\'s happening today.' },
@@ -75,11 +65,7 @@ const Header = ({ currentPath, onMenuClick }) => {
 
   // Preload all data once for instant search
   useEffect(() => {
-<<<<<<< HEAD
-=======
 
-    
->>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
     const preload = async () => {
       try {
         const [pRes, cRes, uRes, aRes] = await Promise.all([
@@ -106,7 +92,6 @@ const Header = ({ currentPath, onMenuClick }) => {
 
   // Run search against preloaded data
   useEffect(() => {
-<<<<<<< HEAD
     if (!debouncedSearch.trim()) {
       setSearchResults([]);
       setShowSearchDrop(false);
@@ -115,34 +100,8 @@ const Header = ({ currentPath, onMenuClick }) => {
     setSearchLoading(true);
     const q = debouncedSearch.toLowerCase();
 
-    const policyMatches = allData.policies
-      .filter(p => p.id?.toLowerCase().includes(q) || p.holder?.toLowerCase().includes(q) || p.type?.toLowerCase().includes(q) || p.plan?.toLowerCase().includes(q))
-      .slice(0, 3)
-      .map(p => ({ kind: 'policy', id: p.id, title: p.id, subtitle: `${p.holder} · ${p.type} · ${p.status}`, status: p.status }));
-
-    const claimMatches = allData.claims
-      .filter(c => c.id?.toLowerCase().includes(q) || c.holder?.toLowerCase().includes(q) || c.type?.toLowerCase().includes(q))
-      .slice(0, 3)
-      .map(c => ({ kind: 'claim', id: c.id, title: c.id, subtitle: `${c.holder} · ${c.type} · ${c.status}`, status: c.status }));
-
-    const userMatches = allData.users
-      .filter(u => u.name?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q) || u.city?.toLowerCase().includes(q))
-      .slice(0, 3)
-      .map(u => ({ kind: 'user', id: u.id, title: u.name, subtitle: `${u.email} · ${u.city}`, status: u.status }));
-
-    const agentMatches = allData.agents
-      .filter(a => a.name?.toLowerCase().includes(q) || a.email?.toLowerCase().includes(q) || a.specialization?.toLowerCase().includes(q))
-      .slice(0, 2)
-      .map(a => ({ kind: 'agent', id: a.id, title: a.name, subtitle: `${a.specialization} · ${a.city}`, status: a.status }));
-
-    const results = [...policyMatches, ...claimMatches, ...userMatches, ...agentMatches];
-    setSearchResults(results);
-    setShowSearchDrop(true);
-    setSearchLoading(false);
-=======
     if (portal === "user") {
       const data = getUserData();
-      const q = debouncedSearch.toLowerCase();
     
       const policyMatches = (data.policies || [])
         .filter(p =>
@@ -178,8 +137,31 @@ const Header = ({ currentPath, onMenuClick }) => {
       setSearchLoading(false);
       return;
     } 
- 
->>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
+
+    const policyMatches = allData.policies
+      .filter(p => p.id?.toLowerCase().includes(q) || p.holder?.toLowerCase().includes(q) || p.type?.toLowerCase().includes(q) || p.plan?.toLowerCase().includes(q))
+      .slice(0, 3)
+      .map(p => ({ kind: 'policy', id: p.id, title: p.id, subtitle: `${p.holder} · ${p.type} · ${p.status}`, status: p.status }));
+
+    const claimMatches = allData.claims
+      .filter(c => c.id?.toLowerCase().includes(q) || c.holder?.toLowerCase().includes(q) || c.type?.toLowerCase().includes(q))
+      .slice(0, 3)
+      .map(c => ({ kind: 'claim', id: c.id, title: c.id, subtitle: `${c.holder} · ${c.type} · ${c.status}`, status: c.status }));
+
+    const userMatches = allData.users
+      .filter(u => u.name?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q) || u.city?.toLowerCase().includes(q))
+      .slice(0, 3)
+      .map(u => ({ kind: 'user', id: u.id, title: u.name, subtitle: `${u.email} · ${u.city}`, status: u.status }));
+
+    const agentMatches = allData.agents
+      .filter(a => a.name?.toLowerCase().includes(q) || a.email?.toLowerCase().includes(q) || a.specialization?.toLowerCase().includes(q))
+      .slice(0, 2)
+      .map(a => ({ kind: 'agent', id: a.id, title: a.name, subtitle: `${a.specialization} · ${a.city}`, status: a.status }));
+
+    const results = [...policyMatches, ...claimMatches, ...userMatches, ...agentMatches];
+    setSearchResults(results);
+    setShowSearchDrop(true);
+    setSearchLoading(false);
   }, [debouncedSearch, allData]);
 
   // Close search on outside click
@@ -212,19 +194,9 @@ const Header = ({ currentPath, onMenuClick }) => {
         setUnreadCount(notifs.length);
       }
     } catch (e) {
-<<<<<<< HEAD
-      setNotifications([
-        { id: 0, title: 'New policy issued: AUTO-892', time: '5 mins ago', color: '#10b981', read: false },
-        { id: 1, title: 'Claim CLM-419 approved', time: '12 mins ago', color: '#3b82f6', read: false },
-        { id: 2, title: 'New user registration', time: '1 hour ago', color: '#8b5cf6', read: false },
-        { id: 3, title: 'Payment failed for HLT-223', time: '2 hours ago', color: '#ef4444', read: false },
-      ]);
-      setUnreadCount(4);
-=======
       console.error('Failed to fetch notifications', e);
       setNotifications([]);
       setUnreadCount(0);
->>>>>>> 75ae30bfff395c6740f8c31abd13bb919a3e4cb6
     }
   };
 
